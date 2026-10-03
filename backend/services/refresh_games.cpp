@@ -25,6 +25,7 @@ static Game mergeSavedGame(const Game& reading, const std::vector<Game>& previou
 }
 
 bool refreshGames(DashboardState& state) {
+    static std::size_t detailsStart = 0, ratingsStart = 0;
     std::vector<Game> previous;
     {
         std::lock_guard<std::mutex> lock(state.mutex);
@@ -39,30 +40,37 @@ bool refreshGames(DashboardState& state) {
         sortGames(candidates); // Hint: our QuickSort determines the ranking.
         std::vector<Game> selected;
         const long long now = std::time(nullptr);
-        for (const auto& reading : candidates) {
+        // Hint: rotate a small group of Steam requests rather than requesting 100 at once.
+        for (std::size_t index = 0; index < candidates.size(); ++index) {
             if (!state.running) break;
-            Game game = mergeSavedGame(reading, previous);
-            if (now - game.detailsUpdatedAt >= DetailsRefreshSeconds) {
+            Game game = mergeSavedGame(candidates[index], previous);
+            const auto distance = (index + candidates.size() - detailsStart % candidates.size()) % candidates.size();
+            if (distance < DetailsPerRefresh && now - game.detailsUpdatedAt >= DetailsRefreshSeconds) {
                 try {
-                    if (!fetchSteamDetails(game)) throw std::runtime_error("Game details unavailable.");
+                    Game updated = game;
+                    if (!fetchSteamDetails(updated)) throw std::runtime_error("Game details unavailable.");
+                    game = std::move(updated);
                 } catch (const std::exception&) {
-                    if (game.title.empty()) throw std::runtime_error("Game details unavailable; keeping the previous ranking.");
-                    message = "Some game details could not refresh. Saved details are shown.";
+                    message = "Some Steam details could not refresh. Available games are shown.";
                 }
             }
-            if (game.type != "game") continue;
-            if (now - game.reviewsUpdatedAt >= ReviewRefreshSeconds) {
-                try { fetchSteamReviews(game); }
-                catch (const std::exception&) { message = "Some reviews could not refresh. Check their update time."; }
-            }
+            if (game.type != "game" || game.title.empty()) continue;
             // Hint: cached Steam responses never create duplicate chart points.
             if (game.history.empty() || game.history.back().time < game.playersUpdatedAt)
                 game.history.push_back({game.playersUpdatedAt, game.currentPlayers});
             if (game.history.size() > MaximumChartReadings) game.history.erase(game.history.begin());
             selected.push_back(game);
-            if (selected.size() == DashboardGames) break;
         }
-        if (selected.size() != DashboardGames) throw std::runtime_error("Steam ranking incomplete; saved data retained.");
+        detailsStart = (detailsStart + DetailsPerRefresh) % candidates.size();
+        if (selected.empty()) throw std::runtime_error("Steam games unavailable; saved data retained.");
+        for (std::size_t step = 0; step < selected.size() && step < RatingsPerRefresh && state.running; ++step) {
+            Game& game = selected[(ratingsStart + step) % selected.size()];
+            if (now - game.reviewsUpdatedAt < ReviewRefreshSeconds) continue;
+            try { fetchSteamReviews(game); }
+            catch (const std::exception&) { message = "Some ratings could not refresh. Saved ratings are shown."; }
+        }
+        ratingsStart = (ratingsStart + RatingsPerRefresh) % selected.size();
+        if (!state.running) throw std::runtime_error("Refresh stopped; saved data retained.");
         if (!saveGames(selected))
             message = "Live counts updated. Chart history could not be saved.";
         {

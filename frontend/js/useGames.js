@@ -6,6 +6,8 @@ export function useGames(search, genre, sort) {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   useEffect(() => {
+    setLoading(true);
+    setData(previous => ({ ...previous, games: [] }));
     let stopped = false;
     let controller;
     let interval;

@@ -46,8 +46,7 @@ h1, h2, h3 { line-height: 1.08; }
 .hero-copy > .eyebrow { color: var(--paper); display: flex; align-items: center; gap: 9px; }
 .square-dot { display: inline-block; width: 6px; height: 6px; background: var(--orange); flex-shrink: 0; }
 .hero h1 { font: 850 clamp(68px, 7.3vw, 106px)/.95 var(--display); letter-spacing: -5.5px; margin: 22px 0 22px; position: relative; width: fit-content; }
-.hero h1 > span:not(.heading-arrow) { color: var(--orange); }
-.heading-arrow { position: absolute; font: 64px/1 var(--display); color: var(--orange); right: -84px; top: -6px; }
+.hero h1 > span { color: var(--orange); }
 .hero-intro { color: var(--muted); font-size: 14px; line-height: 1.7; max-width: 365px; }
 .text-link { display: inline-flex; gap: 16px; align-items: center; text-decoration: none; background: transparent; font-size: 12px; font-weight: 600; padding: 0; }
 .text-link:hover { color: var(--orange); }
@@ -58,7 +57,6 @@ h1, h2, h3 { line-height: 1.08; }
 .featured-game:hover > img { transform: scale(1.025); }
 .featured-top { position: absolute; top: 18px; left: 18px; right: 18px; display: flex; justify-content: space-between; align-items: center; font: 9px var(--mono); letter-spacing: 1px; }
 .featured-top > span:first-child { background: var(--paper); color: var(--ink); padding: 6px 9px; }
-.featured-top > span:last-child { background: var(--ink); width: 28px; height: 28px; text-align: center; font-size: 20px; }
 .featured-bottom { position: absolute; inset: auto 0 0; padding: 22px; background: rgba(15, 18, 14, .96); display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .featured-name { font: 600 24px/1.15 var(--display); max-width: 50%; }
 .featured-players { font: 25px/1.2 var(--mono); text-align: right; color: var(--lime); }
@@ -91,7 +89,6 @@ h1, h2, h3 { line-height: 1.08; }
 .card-image-button img { width: 100%; height: 100%; object-fit: cover; }
 .card-image-button:focus-visible { outline-offset: -4px; }
 .rank { position: absolute; top: 12px; left: 12px; font: 12px var(--mono); color: var(--ink); background: var(--paper); padding: 4px 7px; border-radius: 2px; }
-.image-arrow { position: absolute; bottom: 10px; right: 12px; width: 29px; height: 29px; background: var(--ink); color: var(--paper); font-size: 22px; line-height: 29px; border-radius: 2px; }
 .card-content { padding: 20px 20px 0; }
 .card-genre { color: var(--muted); font: 9px/1.5 var(--mono); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 8px; }
 .card-content h3 { min-height: 48px; font: 600 23px/1.15 var(--display); letter-spacing: -.5px; }
@@ -137,11 +134,10 @@ h1, h2, h3 { line-height: 1.08; }
 .page-footer { display:flex; justify-content:space-between; align-items:center; gap:20px; border-top:1px solid var(--line); padding:22px 0 28px; margin-top:40px; color:var(--muted); font:9px/1.6 var(--mono); }
 .page-footer>span { font:600 21px var(--display); color:var(--paper); letter-spacing:-.7px; }
 .startup { text-align:center; margin:80px 20px; color:var(--muted); }
-/* Hint: restored genre cards use the current eight games. */
+/* Hint: genre cards use the larger Steam collection. */
 .genre-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:22px; }
 .genre-card { border:1px solid var(--line); padding:26px; background:var(--surface); border-radius:4px; display:flex; flex-direction:column; }
 .genre-card-top { display:flex; justify-content:space-between; align-items:center; font:10px var(--mono); color:var(--muted); }
-.genre-card-top>span:last-child { color:var(--orange); font-size:25px; }
 .genre-card h3 { font:600 35px var(--display); letter-spacing:-1px; margin:18px 0 24px; }
 .genre-games { margin-bottom:24px; }
 .genre-game { display:flex; width:100%; align-items:center; gap:14px; background:transparent; border-top:1px solid var(--line); padding:12px 0; text-align:left; font-size:12px; }
@@ -195,8 +191,45 @@ body:has(.game-dialog[open]) { overflow:hidden; }
 .helpful { color:var(--muted); font:9px var(--mono); margin-top:12px; }
 .empty-reviews { color:var(--muted); padding:30px 0; }
 /* Hint: tablet and phone spacing. */
-@media(max-width:1050px) { .hero { gap:45px; } .hero h1 { font-size:86px; letter-spacing:-4px; } .heading-arrow { right:-55px; font-size:48px; } .featured-name { font-size:21px; } .featured-players { font-size:21px; } .card-content { padding:16px 16px 0; } .player-number { font-size:21px; } .card-rating .rating { font-size:19px; } .game-grid { gap:18px; } }
-@media(max-width:800px) { .masthead { padding:18px 25px; min-height:85px; } .shell { width:calc(100% - 50px); } .hero { grid-template-columns:1fr 1fr; gap:30px; padding:40px 0 30px; } .hero h1 { font-size:69px; letter-spacing:-3px; } .heading-arrow { font-size:38px; right:-40px; } .hero-intro { font-size:12px; } .hero-footnote { flex-direction:column; gap:7px; margin-top:23px; } .featured-game { aspect-ratio:1.15; } .featured-bottom { padding:15px; display:block; } .featured-name { display:block; max-width:none; font-size:20px; } .featured-players { display:block; text-align:left; margin-top:8px; font-size:20px; } .featured-players small { margin-top:2px; } .featured-top { inset:12px 12px auto; } .game-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .toolbar { flex-wrap:wrap; } .search-field { flex-basis:100%; } .genre-select,.sort-select { flex:1; } .genre-select select,.sort-select select { width:100%; height:44px; } .genre-card { padding:20px; } .genre-game { gap:9px; font-size:11px; } .genre-game img { width:50px; } .genre-game>span:last-child { font-size:10px; } }
-@media(max-width:580px) { .masthead { padding:17px 20px; gap:18px; flex-wrap:wrap; } .brand { font-size:24px; gap:10px; } .brand-mark { width:38px; height:38px; font-size:32px; } .brand-mark span { font-size:16px; } .edition { margin-left:auto; font-size:8px; } .main-nav { order:3; width:100%; gap:25px; } .main-nav button { padding:9px 0 6px; font-size:12px; } .shell { width:calc(100% - 40px); } .hero { grid-template-columns:1fr; gap:28px; padding-top:34px; } .hero h1 { font-size:78px; letter-spacing:-4px; margin-top:17px; margin-bottom:15px; } .heading-arrow { font-size:42px; right:-48px; top:-2px; } .hero-intro { font-size:13px; } .hero-footnote { flex-direction:row; margin-top:25px; padding-top:12px; } .hero .text-link { margin-top:18px; } .featured-game { aspect-ratio:1.58; } .featured-bottom { display:flex; padding:17px; } .featured-name { max-width:50%; font-size:21px; } .featured-players { margin-top:0; text-align:right; font-size:20px; } .featured-players small { font-size:8px; margin-top:5px; } .art-caption { font-size:8px; padding-top:12px; } .snapshot-strip { gap:10px; font-size:9px; } .export-time { margin-left:0; font-size:8px; } .section-heading { padding:30px 0 20px; gap:15px; } .section-heading h2 { font-size:32px; } .section-heading>p { font-size:10px; max-width:145px; } .game-grid,.genre-grid { grid-template-columns:1fr; gap:20px; } .card-content { padding:20px 20px 0; } .card-content h3 { min-height:0; font-size:25px; } .card-metric { padding-top:18px; } .player-number { font-size:25px; } .card-rating .rating { font-size:23px; } .page-footer { align-items:flex-start; } .page-footer p { max-width:220px; text-align:right; font-size:8px; } .game-dialog { width:calc(100% - 20px); max-height:94vh; padding:20px 16px; } .detail-header { height:245px; margin:-20px -16px 20px; } .detail-header>div { padding:60px 20px 20px; } .detail-header h2 { font-size:29px; } .detail-stats { padding:13px; gap:12px; } .detail-stats strong,.detail-stats .rating { font-size:18px; } .detail-stats>div>span:first-child { font-size:8px; } .detail-stats .rating>span { font-size:8px; white-space:normal; } .review-card { padding:16px; } .reviews-heading { gap:12px; align-items:start; } .reviews-heading h3 { font-size:24px; } .review-total { font-size:9px; } .genre-card h3 { font-size:32px; } .genre-game img { width:65px; } }
-@media(max-width:360px) { .hero h1 { font-size:68px; } .heading-arrow { right:-40px; font-size:34px; } .main-nav { gap:20px; } .featured-name { font-size:18px; } .featured-players { font-size:18px; } .card-content { padding:17px 17px 0; } }
+@media(max-width:1050px) { .hero { gap:45px; } .hero h1 { font-size:86px; letter-spacing:-4px; } .featured-name { font-size:21px; } .featured-players { font-size:21px; } .card-content { padding:16px 16px 0; } .player-number { font-size:21px; } .card-rating .rating { font-size:19px; } .game-grid { gap:18px; } }
+@media(max-width:800px) { .masthead { padding:18px 25px; min-height:85px; } .shell { width:calc(100% - 50px); } .hero { grid-template-columns:1fr 1fr; gap:30px; padding:40px 0 30px; } .hero h1 { font-size:69px; letter-spacing:-3px; } .hero-intro { font-size:12px; } .hero-footnote { flex-direction:column; gap:7px; margin-top:23px; } .featured-game { aspect-ratio:1.15; } .featured-bottom { padding:15px; display:block; } .featured-name { display:block; max-width:none; font-size:20px; } .featured-players { display:block; text-align:left; margin-top:8px; font-size:20px; } .featured-players small { margin-top:2px; } .featured-top { inset:12px 12px auto; } .game-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } .toolbar { flex-wrap:wrap; } .search-field { flex-basis:100%; } .genre-select,.sort-select { flex:1; } .genre-select select,.sort-select select { width:100%; height:44px; } .genre-card { padding:20px; } .genre-game { gap:9px; font-size:11px; } .genre-game img { width:50px; } .genre-game>span:last-child { font-size:10px; } }
+@media(max-width:580px) { .masthead { padding:17px 20px; gap:18px; flex-wrap:wrap; } .brand { font-size:24px; gap:10px; } .brand-mark { width:38px; height:38px; font-size:32px; } .brand-mark span { font-size:16px; } .edition { margin-left:auto; font-size:8px; } .main-nav { order:3; width:100%; gap:25px; } .main-nav button { padding:9px 0 6px; font-size:12px; } .shell { width:calc(100% - 40px); } .hero { grid-template-columns:1fr; gap:28px; padding-top:34px; } .hero h1 { font-size:78px; letter-spacing:-4px; margin-top:17px; margin-bottom:15px; } .hero-intro { font-size:13px; } .hero-footnote { flex-direction:row; margin-top:25px; padding-top:12px; } .hero .text-link { margin-top:18px; } .featured-game { aspect-ratio:1.58; } .featured-bottom { display:flex; padding:17px; } .featured-name { max-width:50%; font-size:21px; } .featured-players { margin-top:0; text-align:right; font-size:20px; } .featured-players small { font-size:8px; margin-top:5px; } .art-caption { font-size:8px; padding-top:12px; } .snapshot-strip { gap:10px; font-size:9px; } .export-time { margin-left:0; font-size:8px; } .section-heading { padding:30px 0 20px; gap:15px; } .section-heading h2 { font-size:32px; } .section-heading>p { font-size:10px; max-width:145px; } .game-grid,.genre-grid { grid-template-columns:1fr; gap:20px; } .card-content { padding:20px 20px 0; } .card-content h3 { min-height:0; font-size:25px; } .card-metric { padding-top:18px; } .player-number { font-size:25px; } .card-rating .rating { font-size:23px; } .page-footer { align-items:flex-start; } .page-footer p { max-width:220px; text-align:right; font-size:8px; } .game-dialog { width:calc(100% - 20px); max-height:94vh; padding:20px 16px; } .detail-header { height:245px; margin:-20px -16px 20px; } .detail-header>div { padding:60px 20px 20px; } .detail-header h2 { font-size:29px; } .detail-stats { padding:13px; gap:12px; } .detail-stats strong,.detail-stats .rating { font-size:18px; } .detail-stats>div>span:first-child { font-size:8px; } .detail-stats .rating>span { font-size:8px; white-space:normal; } .review-card { padding:16px; } .reviews-heading { gap:12px; align-items:start; } .reviews-heading h3 { font-size:24px; } .review-total { font-size:9px; } .genre-card h3 { font-size:32px; } .genre-game img { width:65px; } }
+@media(max-width:360px) { .hero h1 { font-size:68px; } .main-nav { gap:20px; } .featured-name { font-size:18px; } .featured-players { font-size:18px; } .card-content { padding:17px 17px 0; } }
 @media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; } }
+/* Hint: navigation remains available while browsing games and genres. */
+.masthead { position:sticky; top:0; z-index:20; background:var(--ink); }
+.games-section { scroll-margin-top:0; }
+.back-to-genres { margin-top:24px; }
+.collection-note { margin-bottom:16px; }
+.all-games-link { margin-bottom:24px; color:var(--orange); }
+.browse-actions { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:24px; margin-top:28px; }
+button:disabled { opacity:.55; cursor:wait; }
+.content-controls { display:flex; align-items:center; flex-wrap:wrap; gap:18px; margin:16px 0; }
+.content-controls label { display:flex; align-items:center; gap:12px; font-size:12px; color:var(--muted); min-width:0; }
+.content-controls select { border:1px solid var(--line); padding:10px 12px; background:var(--surface); color:var(--paper); border-radius:3px; font-size:12px; max-width:440px; min-width:0; }
+.content-controls>span { margin-left:auto; }
+.detail-nav { position:sticky; top:-30px; z-index:1; display:flex; gap:25px; padding:12px 0; margin-bottom:20px; background:var(--ink); border-bottom:1px solid var(--line); }
+.detail-nav button { background:transparent; color:var(--muted); padding:6px 0; border-bottom:2px solid transparent; font-size:13px; }
+.detail-nav button[aria-pressed="true"] { color:var(--paper); border-color:var(--orange); }
+.detail-nav+.reviews-section { margin-top:0; padding-top:0; border-top:0; }
+.patches-section { margin-top:24px; }
+.patch-list { display:grid; gap:18px; margin-top:22px; }
+.patch-card { padding:24px; background:var(--surface); border:1px solid var(--line); border-radius:4px; }
+.patch-meta { display:flex; justify-content:space-between; gap:14px; font:10px var(--mono); color:var(--muted); }
+.patch-meta>span { color:var(--orange); }
+.patch-card h4 { font:600 23px/1.3 var(--display); margin:14px 0; }
+.patch-card h4 a { text-decoration:none; }
+.patch-card h4 a:hover { color:var(--orange); }
+.patch-text { font-size:13px; line-height:1.8; color:#d8dbce; white-space:pre-wrap; overflow-wrap:anywhere; max-height:280px; overflow:auto; margin-bottom:18px; }
+@media(max-width:580px) {
+  html { scroll-padding-top:150px; }
+  .games-section { scroll-margin-top:0; }
+  .content-controls { gap:12px; }
+  .content-controls select { max-width:calc(100vw - 110px); }
+  .content-controls>span { width:100%; margin-left:0; }
+  .detail-nav { top:-20px; gap:22px; padding-right:38px; }
+  .detail-nav button { font-size:12px; }
+  .patch-card { padding:18px; }
+  .patch-card h4 { font-size:21px; }
+}
+

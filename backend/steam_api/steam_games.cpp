@@ -1,5 +1,6 @@
 #include "steam_games.h"
 #include "../network/http_client.h"
+#include "../config/settings.h"
 #include <set>
 #include <stdexcept>
 #include <ctime>
@@ -20,9 +21,9 @@ std::vector<Game> fetchSteamLeaderboard() {
         game.playersUpdatedAt = time;
         if (game.appID > 0 && game.currentPlayers >= 0 && game.peakToday >= 0 && seen.insert(game.appID).second)
             games.push_back(game);
-        if (games.size() >= 100) break;
+        if (games.size() >= MaximumTrackedGames) break;
     }
-    if (games.size() < 8) throw std::runtime_error("Steam returned fewer than eight games.");
+    if (games.size() < DashboardGames) throw std::runtime_error("Steam returned fewer than eight games.");
     return games;
 }
 

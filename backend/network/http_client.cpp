@@ -14,7 +14,7 @@ struct CurlRuntime {
 static size_t receiveBody(char* data, size_t size, size_t count, void* output) {
     auto& response = *static_cast<std::string*>(output);
     const size_t bytes = size * count;
-    if (bytes > 4 * 1024 * 1024 - response.size()) return 0;
+    if (bytes > 16 * 1024 * 1024 - response.size()) return 0;
     try { response.append(data, bytes); return bytes; }
     catch (...) { return 0; }
 }

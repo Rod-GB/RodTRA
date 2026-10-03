@@ -30,10 +30,13 @@ add_executable(rodtra
   network/http_client.cpp
   steam_api/steam_games.cpp
   steam_api/steam_reviews.cpp
+  steam_api/steam_patches.cpp
   database/turso_client.cpp
   database/game_store.cpp
   services/refresh_games.cpp
+  services/content_cache.cpp
   server/api_routes.cpp
+  server/content_routes.cpp
   server/web_server.cpp
 )
 target_link_libraries(rodtra PRIVATE nlohmann_json::nlohmann_json httplib::httplib CURL::libcurl Threads::Threads)

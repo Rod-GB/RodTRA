@@ -26,7 +26,15 @@ Json dashboardResponse(DashboardState& state, const Query& query) {
     } else games = filterGames(games, search, queryValue(query, "genre"));
     const auto order = queryValue(query, "sort");
     sortGames(games, order == "rating" ? GameOrder::Rating : order == "title" ? GameOrder::Title : GameOrder::Players);
-    return {{"games", games}, {"genres", genres}, {"trackedGames", state.games.size()},
+    // Hint: list requests leave chart history and review text on the detail route.
+    Json cards = Json::array();
+    for (const auto& game : games) {
+        Json card = game;
+        card.erase("history");
+        card.erase("reviews");
+        cards.push_back(std::move(card));
+    }
+    return {{"games", cards}, {"genres", genres}, {"trackedGames", state.games.size()},
         {"refreshing", state.refreshing}, {"message", state.message}, {"lastCheckedAt", state.lastCheckedAt},
         {"serverTime", std::time(nullptr)}, {"playerRefreshSeconds", PlayerRefreshSeconds},
         {"reviewRefreshSeconds", ReviewRefreshSeconds}, {"sort", order.empty() ? "players" : order}};
@@ -42,7 +50,7 @@ Json gameResponse(DashboardState& state, const Query& query) {
     if (id.empty() || id.find_first_not_of("0123456789") != std::string::npos) return {{"error", "Invalid game ID."}};
     try { appID = std::stoi(id); } catch (...) { return {{"error", "Invalid game ID."}}; }
     const int index = binarySearchByAppID(games, appID);
-    if (index < 0) return {{"error", "This game is no longer in the top eight."}};
+    if (index < 0) return {{"error", "This game is not in the current Steam collection."}};
     return {{"game", games[index]}};
 }
 

@@ -1,5 +1,6 @@
 #include "web_server.h"
 #include "api_routes.h"
+#include "content_routes.h"
 #include "../config/settings.h"
 #include <httplib.h>
 #include <fstream>
@@ -29,6 +30,13 @@ void runWebsiteServer(DashboardState& state) {
         response.status = body.contains("error") ? 404 : 200;
         response.set_content(body.dump(), "application/json; charset=utf-8");
     });
+    for (bool patches : {false, true}) {
+        server.Get(patches ? "/api/patches" : "/api/reviews", [&, patches](const auto& request, auto& response) {
+            const Json body = contentResponse(state, queryParameters(request), patches);
+            response.status = body.contains("error") ? 503 : 200;
+            response.set_content(body.dump(), "application/json; charset=utf-8");
+        });
+    }
     const std::map<std::string, std::pair<std::string, std::string>> files = {
         {"/", {"index.html", "text/html; charset=utf-8"}},
         {"/index.html", {"index.html", "text/html; charset=utf-8"}},
