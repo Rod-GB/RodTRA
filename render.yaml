@@ -1,0 +1,13 @@
+# Hint: the secret values are entered in Render, never saved in GitHub.
+services:
+  - type: web
+    name: rodtra
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: TURSO_DATABASE_URL
+        sync: false
+      - key: TURSO_AUTH_TOKEN
+        sync: false

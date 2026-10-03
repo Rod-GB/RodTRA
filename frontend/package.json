@@ -1,0 +1,16 @@
+{
+  "name": "rodtra-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "esbuild js/dashboard.jsx --bundle --minify --legal-comments=eof --define:process.env.NODE_ENV=\"\\\"production\\\"\" --outfile=assets/dashboard.bundle.js"
+  },
+  "dependencies": {
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "recharts": "3.10.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
