@@ -13,7 +13,7 @@ static void stopServer(int) {
     state.running = false;
 }
 
-// Hint: main only connects the modules; each module has its own folder.
+// main only connects the modules; each module has its own folder.
 int main() {
     state.projectFolder = std::filesystem::current_path();
     try {

@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
-project(RodTRA LANGUAGES CXX)
+project(Gdaw LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(CURL REQUIRED)
 find_package(Threads REQUIRED)
 
-# Hint: libraries download into the build folder, outside our source code.
+# libraries download into the build folder, outside our source code.
 include(FetchContent)
 FetchContent_Declare(json
   URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz

@@ -1,4 +1,4 @@
-# Hint: the secret values are entered in Render, never saved in GitHub.
+# the secret values are entered in Render, never saved in GitHub.
 services:
   - type: web
     name: rodtra

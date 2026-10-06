@@ -19,7 +19,7 @@ static size_t receiveBody(char* data, size_t size, size_t count, void* output) {
     catch (...) { return 0; }
 }
 
-// Hint: libcurl handles HTTPS directly; tokens never go through a shell command.
+// libcurl handles HTTPS directly; tokens never go through a shell command.
 Json requestJson(const std::string& url, const Json& body, const std::string& token) {
     static CurlRuntime runtime;
     std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> request(curl_easy_init(), curl_easy_cleanup);
@@ -32,7 +32,7 @@ Json requestJson(const std::string& url, const Json& body, const std::string& to
     curl_easy_setopt(request.get(), CURLOPT_NOSIGNAL, 1L);
     curl_easy_setopt(request.get(), CURLOPT_WRITEFUNCTION, receiveBody);
     curl_easy_setopt(request.get(), CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(request.get(), CURLOPT_USERAGENT, "RodTRA/1.0");
+    curl_easy_setopt(request.get(), CURLOPT_USERAGENT, "Gdaw/1.0");
     curl_easy_setopt(request.get(), CURLOPT_ACCEPT_ENCODING, "");
     curl_slist* rawHeaders = curl_slist_append(nullptr, "Content-Type: application/json");
     if (!rawHeaders) throw std::runtime_error("HTTPS headers could not be created.");

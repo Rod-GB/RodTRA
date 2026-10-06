@@ -4,14 +4,14 @@
 #include <nlohmann/json.hpp>
 using Json = nlohmann::json;
 
-// Hint: chart readings use Steam's timestamp.
+// chart readings use Steam's timestamp.
 struct PlayerReading {
     long long time = 0;
     int players = 0;
     NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(PlayerReading, time, players)
 };
 
-// Hint: Steam reviews have a recommendation, not a star score.
+// Steam reviews have a recommendation, not a star score.
 struct Review {
     std::string id, steamID, text;
     bool recommended = false;
@@ -21,7 +21,7 @@ struct Review {
         minutesPlayed, helpfulVotes, time)
 };
 
-// Hint: a vector stores many of these game records.
+// a vector stores many of these game records.
 struct Game {
     int appID = 0, currentPlayers = 0, peakToday = 0;
     std::string title, type, image, description, releaseDate;

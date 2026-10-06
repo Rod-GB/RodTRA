@@ -5,12 +5,11 @@ import ReviewsSection from './ReviewsSection';
 import PatchNotes from './PatchNotes';
 import { number, timestamp, plainText, steamImage } from '../format';
 
-// Hint: a game detail request uses C++ binary search.
-export default function GameDetails({ appID, onClose }) {
+// a game detail request uses C++ binary search.
+export default function GameDetails({ appID, onClose, section = 'overview', onSection }) {
   const dialog = useRef(null);
   const [game, setGame] = useState(null);
   const [error, setError] = useState('');
-  const [section, setSection] = useState('overview');
   useEffect(() => {
     if (!dialog.current.open) dialog.current.showModal();
     let stopped = false;
@@ -40,7 +39,7 @@ export default function GameDetails({ appID, onClose }) {
     {!game ? <h2 id="detail-title">{error ? 'Game unavailable' : 'Loading game…'}</h2> : <>
       <header className="detail-header">{steamImage(game.image) && <img src={steamImage(game.image)} alt=""/>}<div><span className="eyebrow">STEAM GAME</span><h2 id="detail-title">{game.title}</h2><p className="muted">{game.genres.join(' · ')}</p>
         <a className="store-link" href={`https://store.steampowered.com/app/${game.appID}/`} target="_blank" rel="noreferrer">Steam store</a></div></header>
-      <nav className="detail-nav" aria-label="Game sections">{['Overview', 'Reviews', 'Patches'].map(label => <button key={label} aria-pressed={section === label.toLowerCase()} onClick={() => setSection(label.toLowerCase())}>{label}</button>)}</nav>
+      <nav className="detail-nav" aria-label="Game sections">{['Overview', 'Reviews', 'Updates'].map(label => <button key={label} aria-pressed={section === label.toLowerCase()} onClick={() => onSection(label.toLowerCase())}>{label}</button>)}</nav>
       {section === 'overview' ? <><p className="game-description">{plainText(game.description)}</p>
       <div className="detail-stats"><div><span>Players now</span><strong>{number(game.currentPlayers)}</strong></div><div><span>Peak today</span><strong>{number(game.peakToday)}</strong></div><div><span>Overall rating</span><Rating game={game}/></div></div>
       <p className="small muted">Steam player data: {timestamp(game.playersUpdatedAt)} · Released: {game.releaseDate || 'Not listed'}</p>

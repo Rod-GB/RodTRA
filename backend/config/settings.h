@@ -1,6 +1,6 @@
 #pragma once
 
-// Hint: change refresh timing here, not inside the Steam code.
+// change refresh timing here, not inside the Steam code.
 constexpr int DashboardGames = 8;
 constexpr int MaximumTrackedGames = 100;
 constexpr int DetailsPerRefresh = 10;
@@ -10,5 +10,5 @@ constexpr int ReviewRefreshSeconds = 600;
 constexpr int DetailsRefreshSeconds = 86400;
 constexpr int MaximumChartReadings = 1440;
 
-// Hint: Render supplies the listening port through its environment.
+// Render supplies the listening port through its environment.
 int websitePort();

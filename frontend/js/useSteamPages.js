@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Hint: keep Steam's next-page cursor and ignore cancelled requests.
+// keep Steam's next-page cursor and ignore cancelled requests.
 export function useSteamPages(kind, appID, sort = 'recent') {
   const [page, setPage] = useState({ items: [], hasMore: false, updatedAt: 0 });
   const [loading, setLoading] = useState(true);

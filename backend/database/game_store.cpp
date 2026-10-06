@@ -18,7 +18,7 @@ static void prepareHistory() {
     historyReady = true;
 }
 
-// Hint: the same database row supports both the old eight games and a larger collection.
+// the same database row supports both the old eight games and a larger collection.
 std::vector<Game> loadGames() {
     executeSql("CREATE TABLE IF NOT EXISTS dashboard (id INTEGER PRIMARY KEY CHECK (id = 1), data TEXT NOT NULL)");
     const Json rows = executeSql("SELECT data FROM dashboard WHERE id = 1").at("rows");
@@ -52,7 +52,7 @@ std::vector<Game> loadGames() {
         placeholders += '?';
         ids.push_back({{"type", "integer"}, {"value", std::to_string(games[index].appID)}});
     }
-    // Hint: load only this collection's latest 1,440 readings per game.
+    // load only this collection's latest 1,440 readings per game.
     const auto historyRows = executeSql("SELECT json_group_array(json_array(app_id, time, players)) FROM ("
         "SELECT app_id, time, players FROM (SELECT app_id, time, players, "
         "ROW_NUMBER() OVER (PARTITION BY app_id ORDER BY time DESC) AS position FROM player_history WHERE app_id IN (" +
@@ -78,11 +78,11 @@ std::vector<Game> loadGames() {
     return games;
 }
 
-// Hint: bound parameters save the summary after chart inserts succeed.
+// bound parameters save the summary after chart inserts succeed.
 bool saveGames(const std::vector<Game>& games) {
     try {
         prepareHistory();
-        // Hint: migrate old readings once, then insert only newly received readings.
+        // migrate old readings once, then insert only newly received readings.
         Json arguments = Json::array();
         std::string values;
         auto writeReadings = [&] {

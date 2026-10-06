@@ -4,7 +4,7 @@
 
 enum class GameOrder { Players, Rating, Title, AppID };
 
-// Hint: choose what goes first; ID breaks ties consistently.
+// choose what goes first; ID breaks ties consistently.
 inline bool comesBefore(const Game& left, const Game& right, GameOrder order) {
     if (order == GameOrder::Players && left.currentPlayers != right.currentPlayers)
         return left.currentPlayers > right.currentPlayers;
@@ -14,7 +14,7 @@ inline bool comesBefore(const Game& left, const Game& right, GameOrder order) {
     return left.appID < right.appID;
 }
 
-// Hint: partition places records on either side of the pivot.
+// partition places records on either side of the pivot.
 inline int partitionGames(std::vector<Game>& games, int low, int high, GameOrder order) {
     const Game pivot = games[high];
     int boundary = low;
@@ -24,7 +24,7 @@ inline int partitionGames(std::vector<Game>& games, int low, int high, GameOrder
     return boundary;
 }
 
-// Hint: average O(n log n), worst O(n squared). Sort both sides recursively.
+// average O(n log n), worst O(n squared). Sort both sides recursively.
 inline void quickSortGames(std::vector<Game>& games, int low, int high, GameOrder order) {
     if (low >= high) return;
     const int pivot = partitionGames(games, low, high, order);

@@ -6,7 +6,7 @@ export const timestamp = value => value ? new Date(value * 1000).toLocaleString(
 export const percent = game => game.totalReviews ? 100 * game.positiveReviews / game.totalReviews : null;
 export const ratingClass = game => percent(game) === null ? 'muted' : percent(game) >= 70 ? 'positive' : percent(game) >= 40 ? 'mixed' : 'negative';
 
-// Hint: Steam descriptions sometimes contain HTML entities. Display plain text.
+// Steam descriptions sometimes contain HTML entities. Display plain text.
 export function plainText(text) {
   return new DOMParser().parseFromString(text || '', 'text/html').body.textContent || '';
 }

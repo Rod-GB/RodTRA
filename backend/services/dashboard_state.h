@@ -4,7 +4,7 @@
 #include <atomic>
 #include <filesystem>
 
-// Hint: Steam refresh and website requests share this protected vector.
+// Steam refresh and website requests share this protected vector.
 struct DashboardState {
     std::mutex mutex;
     std::vector<Game> games;

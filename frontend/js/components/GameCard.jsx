@@ -2,7 +2,7 @@ import React from 'react';
 import Rating from './Rating';
 import { number, steamImage } from '../format';
 
-// Hint: C++ supplies the ordered records; each card opens live game details.
+// C++ supplies the ordered records; each card opens live game details.
 export default function GameCard({ game, rank, onOpen }) {
   return <article className="game-card">
     <button className="card-image-button" onClick={() => onOpen(game.appID)} aria-label={`View ${game.title} stats`}>

@@ -8,7 +8,7 @@ function ReadingTooltip({ active, payload }) {
   return <div className="chart-tooltip"><strong>{number(reading.players)} players</strong><span>{timestamp(reading.time)}</span></div>;
 }
 
-// Hint: every chart point is a saved reading. A new install starts with one.
+// every chart point is a saved reading. A new install starts with one.
 export default function PlayerChart({ game, large = false }) {
   const [range, setRange] = useState('all');
   const readings = game.history || [];
@@ -23,13 +23,13 @@ export default function PlayerChart({ game, large = false }) {
     <div className="chart-frame" style={{ height: large ? 260 : 210 }}>
       {points.length ? <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={points} margin={{ top: 15, right: 12, left: -16, bottom: 0 }} accessibilityLayer>
-          <defs><linearGradient id={`fill-${game.appID}-${large}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff8054" stopOpacity={0.24}/><stop offset="100%" stopColor="#ff8054" stopOpacity={0}/></linearGradient></defs>
-          <CartesianGrid stroke="#363a32" vertical={false}/>
-          <XAxis dataKey="time" tickFormatter={time} tick={{ fill: '#a8aba1', fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={42}/>
-          <YAxis tickFormatter={compact} tick={{ fill: '#a8aba1', fontSize: 11 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} width={64}/>
-          <Tooltip content={<ReadingTooltip/>} cursor={{ stroke: '#a8aba1', strokeDasharray: '3 3' }}/>
-          <Area type="linear" dataKey="players" name="Players" stroke="#ff8054" strokeWidth={2} fill={`url(#fill-${game.appID}-${large})`} dot={points.length === 1 ? { r: 4, fill: '#ff8054' } : false} activeDot={{ r: 5 }} isAnimationActive={false}/>
-          {large && points.length > 3 && <Brush dataKey="time" height={24} stroke="#747a68" fill="#20231e" tickFormatter={time}/>} 
+          <defs><linearGradient id={`fill-${game.appID}-${large}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#e63858" stopOpacity={0.24}/><stop offset="100%" stopColor="#e63858" stopOpacity={0}/></linearGradient></defs>
+          <CartesianGrid stroke="#2b2c37" vertical={false}/>
+          <XAxis dataKey="time" tickFormatter={time} tick={{ fill: '#aaabbc', fontSize: 11 }} axisLine={false} tickLine={false} minTickGap={42}/>
+          <YAxis tickFormatter={compact} tick={{ fill: '#aaabbc', fontSize: 11 }} axisLine={false} tickLine={false} domain={['auto', 'auto']} width={64}/>
+          <Tooltip content={<ReadingTooltip/>} cursor={{ stroke: '#aaabbc', strokeDasharray: '3 3' }}/>
+          <Area type="linear" dataKey="players" name="Players" stroke="#e63858" strokeWidth={2} fill={`url(#fill-${game.appID}-${large})`} dot={points.length === 1 ? { r: 4, fill: '#e63858' } : false} activeDot={{ r: 5 }} isAnimationActive={false}/>
+          {large && points.length > 3 && <Brush dataKey="time" height={24} stroke="#5e4050" fill="#17181f" tickFormatter={time}/>} 
         </AreaChart>
       </ResponsiveContainer> : <p className="empty-chart">No readings in this range.</p>}
     </div>

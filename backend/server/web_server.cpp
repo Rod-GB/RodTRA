@@ -13,7 +13,7 @@ static Query queryParameters(const httplib::Request& request) {
     return Query(request.params.begin(), request.params.end());
 }
 
-// Hint: the library handles HTTP; our code chooses the public files and API routes.
+// the library handles HTTP; our code chooses the public files and API routes.
 void runWebsiteServer(DashboardState& state) {
     httplib::Server server;
     server.new_task_queue = [] { return new httplib::ThreadPool(4); };
@@ -58,8 +58,8 @@ void runWebsiteServer(DashboardState& state) {
         response.set_content("{\"error\":\"Request could not be completed.\"}", "application/json");
     });
     const int port = websitePort();
-    server.set_start_handler([port] { std::cout << "RodTRA server listening on port " << port << std::endl; });
-    // Hint: Render's shutdown signal stops HTTP requests and the Steam refresh thread.
+    server.set_start_handler([port] { std::cout << "Gdaw server listening on port " << port << std::endl; });
+    // Render's shutdown signal stops HTTP requests and the Steam refresh thread.
     std::atomic<bool> finished{false};
     std::thread shutdown([&] {
         while (!finished) {

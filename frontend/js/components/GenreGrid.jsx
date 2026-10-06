@@ -1,13 +1,14 @@
 import React from 'react';
-import { number, steamImage } from '../format';
+import Icon from './Icon';
+import { steamImage } from '../format';
+import { routeURL } from '../navigation';
 
-export default function GenreGrid({ games, genres, onBrowse, onOpen }) {
-  return <div className="genre-grid">{genres.map(genre => {
+export default function GenreGrid({ games, genres }) {
+  return <div className="genre-grid">{genres.map((genre, index) => {
     const matches = games.filter(game => game.genres.includes(genre));
-    return <article className="genre-card" key={genre}><div className="genre-card-top"><span>{matches.length} {matches.length === 1 ? 'game' : 'games'}</span></div>
-      <h3>{genre}</h3><div className="genre-games">{matches.slice(0, 3).map(game => <button key={game.appID} className="genre-game" onClick={() => onOpen(game.appID)}>
-        {steamImage(game.image) && <img src={steamImage(game.image)} alt=""/>}<span>{game.title}</span><span>{number(game.currentPlayers)}</span>
-      </button>)}</div><button className="text-link genre-explore" onClick={() => onBrowse(genre)}>View games</button>
-    </article>;
+    return <a className={`genre-tile genre-tone-${index % 4}`} key={genre} href={routeURL({ view: 'genres', genre })}>
+      <div className="genre-collage" aria-hidden="true">{matches.slice(0, 3).map(game => steamImage(game.image) && <img key={game.appID} src={steamImage(game.image)} alt="" loading="lazy"/>)}</div>
+      <div className="genre-tile-content"><span className="genre-count">{matches.length} {matches.length === 1 ? 'game' : 'games'}</span><h2>{genre}</h2><span className="genre-tile-action">Explore genre <Icon name="arrow"/></span></div>
+    </a>;
   })}</div>;
 }

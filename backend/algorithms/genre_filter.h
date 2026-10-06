@@ -7,7 +7,7 @@ inline std::string lowercase(std::string text) {
     return text;
 }
 
-// Hint: linear search checks each game's name and exact genre.
+// linear search checks each game's name and exact genre.
 inline std::vector<Game> filterGames(const std::vector<Game>& games,
                                     const std::string& query, const std::string& genre) {
     std::vector<Game> matches;

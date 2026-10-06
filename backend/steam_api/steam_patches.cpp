@@ -3,7 +3,7 @@
 #include <ctime>
 #include <algorithm>
 
-// Hint: use the developer announcement feed, excluding outside news websites.
+// use the developer announcement feed, excluding outside news websites.
 Json fetchSteamPatches(int appID, long long before) {
     std::string url = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=" +
         std::to_string(appID) + "&count=12&maxlength=3000&feeds=steam_community_announcements";

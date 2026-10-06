@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// Hint: C++ handles searching, filtering and sorting through this request.
+// C++ handles searching, filtering and sorting through this request.
 export function useGames(search, genre, sort) {
   const [data, setData] = useState({ games: [], genres: [], trackedGames: 0, refreshing: true });
   const [error, setError] = useState('');

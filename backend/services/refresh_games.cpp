@@ -9,7 +9,7 @@
 #include <ctime>
 #include <iostream>
 
-// Hint: keep chart history and reviews when a game's player count changes.
+// keep chart history and reviews when a game's player count changes.
 static Game mergeSavedGame(const Game& reading, const std::vector<Game>& previous) {
     Game game = reading;
     const int found = binarySearchByAppID(previous, reading.appID);
@@ -37,10 +37,10 @@ bool refreshGames(DashboardState& state) {
     bool success = false;
     try {
         auto candidates = fetchSteamLeaderboard();
-        sortGames(candidates); // Hint: our QuickSort determines the ranking.
+        sortGames(candidates); // our QuickSort determines the ranking.
         std::vector<Game> selected;
         const long long now = std::time(nullptr);
-        // Hint: rotate a small group of Steam requests rather than requesting 100 at once.
+        // rotate a small group of Steam requests rather than requesting 100 at once.
         for (std::size_t index = 0; index < candidates.size(); ++index) {
             if (!state.running) break;
             Game game = mergeSavedGame(candidates[index], previous);
@@ -55,7 +55,7 @@ bool refreshGames(DashboardState& state) {
                 }
             }
             if (game.type != "game" || game.title.empty()) continue;
-            // Hint: cached Steam responses never create duplicate chart points.
+            // cached Steam responses never create duplicate chart points.
             if (game.history.empty() || game.history.back().time < game.playersUpdatedAt)
                 game.history.push_back({game.playersUpdatedAt, game.currentPlayers});
             if (game.history.size() > MaximumChartReadings) game.history.erase(game.history.begin());
@@ -89,7 +89,7 @@ bool refreshGames(DashboardState& state) {
     return success;
 }
 
-// Hint: the backend continues refreshing while the website is open.
+// the backend continues refreshing while the website is open.
 void runAutomaticRefresh(DashboardState& state) {
     while (state.running) {
         refreshGames(state);

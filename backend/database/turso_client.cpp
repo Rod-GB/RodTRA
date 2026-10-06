@@ -4,7 +4,7 @@
 #include <regex>
 #include <stdexcept>
 
-// Hint: these values come from Render, never from the browser or source code.
+// these values come from Render, never from the browser or source code.
 static std::string databaseURL() {
     const char* value = std::getenv("TURSO_DATABASE_URL");
     if (!value) throw std::runtime_error("Set TURSO_DATABASE_URL in the server environment.");

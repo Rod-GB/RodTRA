@@ -1,4 +1,4 @@
-# Hint: Render builds the frontend and C++ backend automatically.
+# Render builds the frontend and C++ backend automatically.
 FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /frontend
 COPY frontend/package.json frontend/package-lock.json ./

@@ -17,7 +17,7 @@ static Review readReview(const Json& row) {
     return review;
 }
 
-// Hint: recent English reviews, with Steam's overall all-language rating.
+// recent English reviews, with Steam's overall all-language rating.
 void fetchSteamReviews(Game& game) {
     const Json input = {{"appid", game.appID}, {"filter", 1}, {"languages", {"english"}},
         {"num_per_page", 10}, {"purchase_type", 1}};
@@ -40,7 +40,7 @@ void fetchSteamReviews(Game& game) {
     game.reviewsUpdatedAt = std::time(nullptr);
 }
 
-// Hint: Steam's cursor requests the next page without downloading every review.
+// Steam's cursor requests the next page without downloading every review.
 Json fetchSteamReviewPage(int appID, const std::string& sort, const std::string& cursor) {
     const std::string filter = sort == "helpful" ? "all" : "recent";
     const Json response = requestJson("https://store.steampowered.com/appreviews/" + std::to_string(appID) +

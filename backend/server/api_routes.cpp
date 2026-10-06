@@ -10,7 +10,7 @@ std::string queryValue(const Query& query, const std::string& key) {
     return found == query.end() ? "" : found->second;
 }
 
-// Hint: the frontend asks C++ to filter and sort; it does not rank games itself.
+// the frontend asks C++ to filter and sort; it does not rank games itself.
 Json dashboardResponse(DashboardState& state, const Query& query) {
     std::lock_guard<std::mutex> lock(state.mutex);
     auto games = state.games;
@@ -26,7 +26,7 @@ Json dashboardResponse(DashboardState& state, const Query& query) {
     } else games = filterGames(games, search, queryValue(query, "genre"));
     const auto order = queryValue(query, "sort");
     sortGames(games, order == "rating" ? GameOrder::Rating : order == "title" ? GameOrder::Title : GameOrder::Players);
-    // Hint: list requests leave chart history and review text on the detail route.
+    // list requests leave chart history and review text on the detail route.
     Json cards = Json::array();
     for (const auto& game : games) {
         Json card = game;
@@ -40,7 +40,7 @@ Json dashboardResponse(DashboardState& state, const Query& query) {
         {"reviewRefreshSeconds", ReviewRefreshSeconds}, {"sort", order.empty() ? "players" : order}};
 }
 
-// Hint: game pages use binary search after QuickSort orders records by ID.
+// game pages use binary search after QuickSort orders records by ID.
 Json gameResponse(DashboardState& state, const Query& query) {
     std::lock_guard<std::mutex> lock(state.mutex);
     auto games = state.games;

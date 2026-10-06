@@ -1,10 +1,11 @@
 import React from 'react';
+import Icon from './Icon';
 
-export default function Masthead({ view, onView, status, cached }) {
+export default function Masthead({ status, cached, menuOpen, onMenu }) {
   return <header className="masthead">
-    <a className="brand" href="/" aria-label="RodTRA home"><span className="brand-mark" aria-hidden="true">R</span><span>RodTRA</span></a>
-    <nav className="main-nav" aria-label="Main views">{['Games', 'Genres', 'Patches'].map(label =>
-      <button key={label} aria-pressed={view === label.toLowerCase()} onClick={() => onView(label.toLowerCase())}>{label}</button>)}</nav>
-    <span className="edition"><span className={`status-dot ${cached ? 'cached' : ''}`}/>{status}</span>
+    <button className="menu-toggle icon-button" aria-label={menuOpen ? 'Close navigation' : 'Open navigation'} aria-expanded={menuOpen} aria-controls="sidebar" onClick={onMenu}><Icon name={menuOpen ? 'close' : 'menu'}/></button>
+    <a className="brand" href="#/dashboard" aria-label="Gdaw home"><span className="brand-mark" aria-hidden="true">G</span><span>Gdaw<span className="brand-period">.</span></span></a>
+    <nav className="main-nav" aria-label="Main navigation"><a href="#/dashboard">Homepage</a></nav>
+    <span className="edition"><span className={`status-dot ${cached ? 'cached' : ''}`}/>Steam <span>{status}</span></span>
   </header>;
 }

@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <ctime>
 
-// Hint: discover Steam's current top 100; no hand-written game list.
+// discover Steam's current top 100; no hand-written game list.
 std::vector<Game> fetchSteamLeaderboard() {
     const Json response = requestJson(
         "https://api.steampowered.com/ISteamChartsService/GetGamesByConcurrentPlayers/v1/").at("response");
@@ -27,7 +27,7 @@ std::vector<Game> fetchSteamLeaderboard() {
     return games;
 }
 
-// Hint: Steam supplies the title, artwork and genres too.
+// Steam supplies the title, artwork and genres too.
 bool fetchSteamDetails(Game& game) {
     const Json result = requestJson("https://store.steampowered.com/api/appdetails?appids=" +
         std::to_string(game.appID) + "&l=english").at(std::to_string(game.appID));

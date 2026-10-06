@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-// Hint: Fisher-Yates shuffles IDs once; count updates keep the same picks.
+// Fisher-Yates shuffles IDs once; count updates keep the same picks.
 export function randomIDs(ids, count = 8, random = Math.random) {
   const shuffled = [...ids];
   for (let index = shuffled.length - 1; index > 0; index--) {
@@ -18,7 +18,10 @@ export function useRandomGames(games) {
     });
   }, [games]);
   const byID = new Map(games.map(game => [game.appID, game]));
-  return ids.map(id => byID.get(id)).filter(Boolean);
+  return {
+    games: ids.map(id => byID.get(id)).filter(Boolean),
+    shuffle: () => setIDs(randomIDs(games.map(game => game.appID))),
+  };
 }
 
 export function keepRandomIDs(previous, availableIDs) {
