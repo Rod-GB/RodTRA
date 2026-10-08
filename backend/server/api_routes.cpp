@@ -10,13 +10,19 @@ std::string queryValue(const Query& query, const std::string& key) {
     return found == query.end() ? "" : found->second;
 }
 
-// the frontend asks C++ to filter and sort; it does not rank games itself.
 Json dashboardResponse(DashboardState& state, const Query& query) {
-    std::lock_guard<std::mutex> lock(state.mutex);
-    auto games = state.games;
+    std::vector<Game> games;
+    Json status;
+    {
+        std::lock_guard<std::mutex> lock(state.mutex);
+        for (const auto& game : state.games) games.push_back(gameSummary(game, false));
+        status = {{"trackedGames", state.games.size()}, {"refreshing", state.refreshing}, {"message", state.message},
+            {"lastCheckedAt", state.lastCheckedAt}, {"playersStatus", !state.playerMessage.empty() ? "reconnecting" :
+                state.rankings.empty() ? "connecting" : "connected"}};
+    }
     std::set<std::string> genres;
     for (const auto& game : games) for (const auto& genre : game.genres) genres.insert(genre);
-    const std::string search = queryValue(query, "q");
+    const auto search = queryValue(query, "q");
     if (!search.empty() && search.find_first_not_of("0123456789") == std::string::npos) {
         sortGames(games, GameOrder::AppID);
         int index = -1;
@@ -26,31 +32,34 @@ Json dashboardResponse(DashboardState& state, const Query& query) {
     } else games = filterGames(games, search, queryValue(query, "genre"));
     const auto order = queryValue(query, "sort");
     sortGames(games, order == "rating" ? GameOrder::Rating : order == "title" ? GameOrder::Title : GameOrder::Players);
-    // list requests leave chart history and review text on the detail route.
     Json cards = Json::array();
     for (const auto& game : games) {
         Json card = game;
-        card.erase("history");
-        card.erase("reviews");
+        card.erase("history"); card.erase("reviews"); card.erase("description");
         cards.push_back(std::move(card));
     }
-    return {{"games", cards}, {"genres", genres}, {"trackedGames", state.games.size()},
-        {"refreshing", state.refreshing}, {"message", state.message}, {"lastCheckedAt", state.lastCheckedAt},
-        {"serverTime", std::time(nullptr)}, {"playerRefreshSeconds", PlayerRefreshSeconds},
-        {"reviewRefreshSeconds", ReviewRefreshSeconds}, {"sort", order.empty() ? "players" : order}};
+    status["games"] = cards; status["genres"] = genres; status["serverTime"] = std::time(nullptr);
+    status["playerRefreshSeconds"] = PlayerRefreshSeconds;
+    status["reviewRefreshSeconds"] = ReviewRefreshSeconds;
+    status["historySaveSeconds"] = HistorySaveSeconds;
+    status["sort"] = order.empty() ? "players" : order;
+    return status;
 }
 
-// game pages use binary search after QuickSort orders records by ID.
 Json gameResponse(DashboardState& state, const Query& query) {
-    std::lock_guard<std::mutex> lock(state.mutex);
-    auto games = state.games;
-    sortGames(games, GameOrder::AppID);
     int appID = 0;
     const auto id = queryValue(query, "id");
     if (id.empty() || id.find_first_not_of("0123456789") != std::string::npos) return {{"error", "Invalid game ID."}};
     try { appID = std::stoi(id); } catch (...) { return {{"error", "Invalid game ID."}}; }
-    const int index = binarySearchByAppID(games, appID);
-    if (index < 0) return {{"error", "This game is not in the current Steam collection."}};
-    return {{"game", games[index]}};
+    Game selected;
+    {
+        std::lock_guard<std::mutex> lock(state.mutex);
+        std::vector<Game> ids;
+        for (const auto& game : state.games) { Game record; record.appID = game.appID; ids.push_back(record); }
+        sortGames(ids, GameOrder::AppID);
+        if (binarySearchByAppID(ids, appID) < 0) return {{"error", "This game is not in the current Steam collection."}};
+        selected = state.records.at(appID);
+    }
+    return {{"game", selected}, {"historySaveSeconds", HistorySaveSeconds}};
 }
 

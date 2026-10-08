@@ -21,11 +21,11 @@ export default function GameDetails({ appID, onClose, section = 'overview', onSe
         const response = await fetch(`/api/game?id=${appID}`, { signal: controller.signal });
         const result = await response.json();
         if (!response.ok) throw new Error(result.error || 'Could not load game details.');
-        if (!stopped) { setGame(result.game); setError(''); }
+        if (!stopped) { setGame({ ...result.game, historySaveSeconds: result.historySaveSeconds || 900 }); setError(''); }
       } catch (failure) { if (!stopped && failure.name !== 'AbortError') setError(failure.message); }
     }
     update();
-    const interval = setInterval(update, 15000);
+    const interval = setInterval(update, 10000);
     return () => { stopped = true; controller?.abort(); clearInterval(interval); };
   }, [appID]);
   return <dialog ref={dialog} className="game-dialog" aria-labelledby="detail-title" onClose={onClose} onClick={event => {

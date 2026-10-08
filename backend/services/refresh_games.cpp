@@ -1,100 +1,249 @@
 #include "refresh_games.h"
 #include "../config/settings.h"
-#include "../algorithms/binary_search.h"
+#include "../algorithms/quick_sort.h"
 #include "../steam_api/steam_games.h"
 #include "../steam_api/steam_reviews.h"
 #include "../database/game_store.h"
+#include "../network/http_client.h"
+#include "updates_feed.h"
 #include <thread>
 #include <chrono>
 #include <ctime>
-#include <iostream>
+#include <set>
+#include <algorithm>
 
-// keep chart history and reviews when a game's player count changes.
-static Game mergeSavedGame(const Game& reading, const std::vector<Game>& previous) {
-    Game game = reading;
-    const int found = binarySearchByAppID(previous, reading.appID);
-    if (found >= 0) {
-        game = previous[found];
-        if (reading.playersUpdatedAt < game.playersUpdatedAt)
-            throw std::runtime_error("Steam sent an older reading; keeping the saved data.");
-        game.currentPlayers = reading.currentPlayers;
-        game.peakToday = reading.peakToday;
-        game.playersUpdatedAt = reading.playersUpdatedAt;
+static void waitSeconds(DashboardState& state, int seconds) {
+    for (int tick = 0; tick < seconds * 10 && state.running; ++tick)
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+static void rememberReading(Game& game) {
+    if (!game.playersUpdatedAt || game.type != "game" || game.title.empty()) return;
+    if (game.history.empty() || game.playersUpdatedAt - game.history.back().time >= HistorySaveSeconds)
+        game.history.push_back({game.playersUpdatedAt, game.currentPlayers});
+    const auto oldest = std::time(nullptr) - 5 * 86400;
+    game.history.erase(std::remove_if(game.history.begin(), game.history.end(),
+        [oldest](const auto& point) { return point.time < oldest; }), game.history.end());
+    if (game.history.size() > MaximumChartReadings)
+        game.history.erase(game.history.begin(), game.history.end() - MaximumChartReadings);
+}
+
+// Publish available counts immediately; optional content warnings stay separate.
+static void publishLocked(DashboardState& state) {
+    state.games.clear();
+    if (state.rankings.empty()) {
+        for (const auto& entry : state.records)
+            if (entry.second.type == "game" && !entry.second.title.empty()) state.games.push_back(entry.second);
+    } else {
+        for (const auto& rank : state.rankings) {
+            const auto found = state.records.find(rank.appID);
+            if (found != state.records.end() && found->second.type == "game" && !found->second.title.empty())
+                state.games.push_back(found->second);
+        }
     }
-    return game;
+    state.message.clear();
+    for (const auto& message : {state.playerMessage, state.detailsMessage, state.ratingMessage, state.storageMessage})
+        if (!message.empty()) { if (!state.message.empty()) state.message += " "; state.message += message; }
 }
 
 bool refreshGames(DashboardState& state) {
-    static std::size_t detailsStart = 0, ratingsStart = 0;
-    std::vector<Game> previous;
     {
         std::lock_guard<std::mutex> lock(state.mutex);
         state.refreshing = true;
-        previous = state.games;
     }
-    sortGames(previous, GameOrder::AppID);
-    std::string message;
-    bool success = false;
     try {
-        auto candidates = fetchSteamLeaderboard();
-        sortGames(candidates); // our QuickSort determines the ranking.
-        std::vector<Game> selected;
-        const long long now = std::time(nullptr);
-        // rotate a small group of Steam requests rather than requesting 100 at once.
-        for (std::size_t index = 0; index < candidates.size(); ++index) {
-            if (!state.running) break;
-            Game game = mergeSavedGame(candidates[index], previous);
-            const auto distance = (index + candidates.size() - detailsStart % candidates.size()) % candidates.size();
-            if (distance < DetailsPerRefresh && now - game.detailsUpdatedAt >= DetailsRefreshSeconds) {
-                try {
-                    Game updated = game;
-                    if (!fetchSteamDetails(updated)) throw std::runtime_error("Game details unavailable.");
-                    game = std::move(updated);
-                } catch (const std::exception&) {
-                    message = "Some Steam details could not refresh. Available games are shown.";
-                }
-            }
-            if (game.type != "game" || game.title.empty()) continue;
-            // cached Steam responses never create duplicate chart points.
-            if (game.history.empty() || game.history.back().time < game.playersUpdatedAt)
-                game.history.push_back({game.playersUpdatedAt, game.currentPlayers});
-            if (game.history.size() > MaximumChartReadings) game.history.erase(game.history.begin());
-            selected.push_back(game);
-        }
-        detailsStart = (detailsStart + DetailsPerRefresh) % candidates.size();
-        if (selected.empty()) throw std::runtime_error("Steam games unavailable; saved data retained.");
-        for (std::size_t step = 0; step < selected.size() && step < RatingsPerRefresh && state.running; ++step) {
-            Game& game = selected[(ratingsStart + step) % selected.size()];
-            if (now - game.reviewsUpdatedAt < ReviewRefreshSeconds) continue;
-            try { fetchSteamReviews(game); }
-            catch (const std::exception&) { message = "Some ratings could not refresh. Saved ratings are shown."; }
-        }
-        ratingsStart = (ratingsStart + RatingsPerRefresh) % selected.size();
-        if (!state.running) throw std::runtime_error("Refresh stopped; saved data retained.");
-        if (!saveGames(selected))
-            message = "Live counts updated. Chart history could not be saved.";
-        {
-            std::lock_guard<std::mutex> lock(state.mutex);
-            state.games = selected;
-        }
-        success = true;
-    } catch (const std::exception& error) { message = error.what(); }
-    {
+        auto ranks = fetchSteamLeaderboard();
+        sortGames(ranks);
         std::lock_guard<std::mutex> lock(state.mutex);
-        state.message = message;
-        state.lastCheckedAt = std::time(nullptr);
+        std::set<int> seen;
+        for (const auto& rank : ranks) {
+            seen.insert(rank.appID);
+            auto& game = state.records[rank.appID];
+            game.appID = rank.appID;
+            if (rank.playersUpdatedAt >= game.playersUpdatedAt) {
+                game.currentPlayers = rank.currentPlayers;
+                game.peakToday = rank.peakToday;
+                game.playersUpdatedAt = rank.playersUpdatedAt;
+            }
+            rememberReading(game);
+        }
+        for (auto iterator = state.records.begin(); iterator != state.records.end();)
+            if (!seen.count(iterator->first)) iterator = state.records.erase(iterator); else ++iterator;
+        state.rankings = std::move(ranks);
+        state.playerMessage.clear();
+        state.playerRetrySeconds = PlayerRefreshSeconds;
         state.refreshing = false;
+        state.lastCheckedAt = std::time(nullptr);
+        publishLocked(state);
+        return true;
+    } catch (const OnlineError& error) {
+        std::lock_guard<std::mutex> lock(state.mutex);
+        state.playerMessage = "Steam player counts could not refresh. Available counts are retained.";
+        state.playerRetrySeconds = std::max(PlayerRefreshSeconds, error.retryAfterSeconds);
+        state.refreshing = false;
+        state.lastCheckedAt = std::time(nullptr);
+        publishLocked(state);
+        return false;
+    } catch (const std::exception&) {
+        std::lock_guard<std::mutex> lock(state.mutex);
+        state.playerMessage = "Steam player counts could not refresh. Available counts are retained.";
+        state.refreshing = false;
+        state.lastCheckedAt = std::time(nullptr);
+        publishLocked(state);
+        return false;
     }
-    std::cout << (success ? "Steam refresh complete. " : "Steam refresh unavailable. ") << message << '\n';
-    return success;
 }
 
-// the backend continues refreshing while the website is open.
-void runAutomaticRefresh(DashboardState& state) {
+// Details and ratings never hold up the player-count loop.
+static void enrichGames(DashboardState& state) {
+    std::map<int, long long> detailsRetry, ratingsRetry;
     while (state.running) {
-        refreshGames(state);
-        for (int second = 0; second < PlayerRefreshSeconds && state.running; ++second)
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::vector<Game> games;
+        {
+            std::lock_guard<std::mutex> lock(state.mutex);
+            for (const auto& entry : state.records) games.push_back(gameSummary(entry.second));
+        }
+        std::stable_sort(games.begin(), games.end(), [](const auto& left, const auto& right) {
+            if (left.title.empty() != right.title.empty()) return left.title.empty();
+            return left.currentPlayers > right.currentPlayers;
+        });
+        int details = 0, ratings = 0, delay = 10;
+        bool limited = false;
+        const long long now = std::time(nullptr);
+        for (auto& game : games) {
+            if (!state.running) break;
+            if (details >= DetailsPerRefresh) break;
+            if (now - game.detailsUpdatedAt < DetailsRefreshSeconds || detailsRetry[game.appID] > now) continue;
+            ++details;
+            try {
+                if (!fetchSteamDetails(game)) throw std::runtime_error("Game details unavailable.");
+                std::lock_guard<std::mutex> lock(state.mutex);
+                const auto found = state.records.find(game.appID);
+                if (found == state.records.end()) continue;
+                auto& current = found->second;
+                current.title = game.title; current.type = game.type; current.image = game.image;
+                current.description = game.description; current.releaseDate = game.releaseDate;
+                current.genres = game.genres; current.detailsUpdatedAt = game.detailsUpdatedAt;
+                rememberReading(current);
+                detailsRetry.erase(game.appID);
+                publishLocked(state);
+            } catch (const OnlineError& failure) {
+                detailsRetry[game.appID] = now + std::max(60, failure.retryAfterSeconds);
+                delay = std::max(delay, failure.retryAfterSeconds); limited = true; break;
+            } catch (...) { detailsRetry[game.appID] = now + 300; }
+        }
+        if (!limited) {
+            std::stable_sort(games.begin(), games.end(),
+                [](const auto& left, const auto& right) { return left.reviewsUpdatedAt < right.reviewsUpdatedAt; });
+            for (auto& game : games) {
+                if (!state.running || ratings >= RatingsPerRefresh) break;
+                if (game.type != "game" || game.title.empty() ||
+                    now - game.reviewsUpdatedAt < ReviewRefreshSeconds || ratingsRetry[game.appID] > now) continue;
+                ++ratings;
+                try {
+                    fetchSteamReviews(game);
+                    std::lock_guard<std::mutex> lock(state.mutex);
+                    const auto found = state.records.find(game.appID);
+                    if (found == state.records.end()) continue;
+                    auto& current = found->second;
+                    current.positiveReviews = game.positiveReviews; current.totalReviews = game.totalReviews;
+                    current.rating = game.rating; current.reviews = std::move(game.reviews);
+                    current.reviewsUpdatedAt = game.reviewsUpdatedAt;
+                    ratingsRetry.erase(game.appID);
+                    publishLocked(state);
+                } catch (const OnlineError& failure) {
+                    ratingsRetry[game.appID] = now + std::max(60, failure.retryAfterSeconds);
+                    delay = std::max(delay, failure.retryAfterSeconds); break;
+                } catch (...) { ratingsRetry[game.appID] = now + 300; }
+            }
+        }
+        {
+            std::lock_guard<std::mutex> lock(state.mutex);
+            for (auto iterator = detailsRetry.begin(); iterator != detailsRetry.end();)
+                if (!state.records.count(iterator->first)) iterator = detailsRetry.erase(iterator); else ++iterator;
+            for (auto iterator = ratingsRetry.begin(); iterator != ratingsRetry.end();)
+                if (!state.records.count(iterator->first)) iterator = ratingsRetry.erase(iterator); else ++iterator;
+            state.detailsMessage = detailsRetry.empty() ? "" : "Some game details are unavailable; retrying in the background.";
+            state.ratingMessage = ratingsRetry.empty() ? "" : "Some ratings could not refresh. Available ratings are retained.";
+            publishLocked(state);
+        }
+        waitSeconds(state, games.empty() ? 1 : delay);
     }
+}
+
+// Database retries and fifteen-minute checkpoints run independently.
+static void storeGames(DashboardState& state) {
+    long long nextSave = 0;
+    while (state.running) {
+        bool restoring;
+        {
+            std::lock_guard<std::mutex> lock(state.mutex);
+            restoring = state.restorePending;
+        }
+        if (restoring) {
+            try {
+                const auto saved = loadGames();
+                std::lock_guard<std::mutex> lock(state.mutex);
+                for (const auto& game : saved) {
+                    if (!state.rankings.empty() && !state.records.count(game.appID)) continue;
+                    auto& current = state.records[game.appID];
+                    Game merged = current.title.empty() || game.detailsUpdatedAt > current.detailsUpdatedAt ? game : current;
+                    if (current.playersUpdatedAt >= game.playersUpdatedAt) {
+                        merged.currentPlayers = current.currentPlayers; merged.peakToday = current.peakToday;
+                        merged.playersUpdatedAt = current.playersUpdatedAt;
+                    }
+                    std::map<long long, int> readings;
+                    for (const auto& point : game.history) readings[point.time] = point.players;
+                    for (const auto& point : current.history) readings[point.time] = point.players;
+                    merged.history.clear();
+                    for (const auto& point : readings)
+                        if (point.first <= merged.playersUpdatedAt) merged.history.push_back({point.first, point.second});
+                    rememberReading(merged);
+                    current = std::move(merged);
+                }
+                state.restorePending = false;
+                state.storageMessage.clear();
+                publishLocked(state);
+            } catch (...) { waitSeconds(state, 60); continue; }
+        }
+        if (std::time(nullptr) >= nextSave) {
+            std::vector<Game> snapshot;
+            {
+                std::lock_guard<std::mutex> lock(state.mutex);
+                snapshot = state.games;
+            }
+            if (!snapshot.empty()) {
+                const bool saved = saveGames(snapshot);
+                {
+                    std::lock_guard<std::mutex> lock(state.mutex);
+                    state.storageMessage = saved ? "" : "Live data is available, but chart history could not be saved. Retrying.";
+                    publishLocked(state);
+                }
+                nextSave = std::time(nullptr) + (saved ? HistorySaveSeconds : 60);
+            }
+        }
+        waitSeconds(state, 1);
+    }
+}
+
+void runAutomaticRefresh(DashboardState& state) {
+    {
+        std::lock_guard<std::mutex> lock(state.mutex);
+        for (const auto& game : state.games) state.records[game.appID] = game;
+    }
+    std::thread metadata([&] { enrichGames(state); });
+    std::thread storage([&] { storeGames(state); });
+    std::thread updates([&] { runUpdatesRefresh(state); });
+    int failed = 0;
+    while (state.running) {
+        const auto started = std::chrono::steady_clock::now();
+        failed = refreshGames(state) ? 0 : std::min(4, failed + 1);
+        int interval = PlayerRefreshSeconds * std::max(1, failed);
+        { std::lock_guard<std::mutex> lock(state.mutex); interval = std::max(interval, state.playerRetrySeconds); }
+        const int elapsed = static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(
+            std::chrono::steady_clock::now() - started).count());
+        waitSeconds(state, std::max(1, interval - elapsed));
+    }
+    metadata.join(); storage.join(); updates.join();
 }
 

@@ -10,6 +10,8 @@ const paths = {
   search: <><circle cx="10" cy="10" r="6"/><path d="m15 15 6 6"/></>,
   menu: <path d="M4 6h16M4 12h16M4 18h16"/>,
   close: <path d="m6 6 12 12M6 18 18 6"/>,
+  library: <><path d="M4 4h5v16H4zm8 0h5v16h-5zm8 1 2 14"/><path d="M4 8h5m3 0h5"/></>,
+  updates: <><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h5"/></>,
 };
 export default function Icon({ name, ...props }) {
   return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" {...props}>{paths[name] || paths.arrow}</svg>;

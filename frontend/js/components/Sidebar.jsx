@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import Icon from './Icon';
 
-const items = [['dashboard', 'Dashboard', 'dashboard'], ['genres', 'Genres', 'genres'], ['most-played', 'Most Played', 'trophy']];
+const items = [['dashboard', 'Dashboard', 'dashboard'], ['all-games', 'All Games', 'library'], ['genres', 'Genres', 'genres'], ['most-played', 'Most Played', 'trophy']];
 
 export default function Sidebar({ view, open, onNavigate }) {
   const sidebar = useRef(null);

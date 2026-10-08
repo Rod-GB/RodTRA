@@ -7,6 +7,8 @@ import GamesView from './components/GamesView';
 import GenresView from './components/GenresView';
 import MostPlayed from './components/MostPlayed';
 import GameDetails from './components/GameDetails';
+import AllGamesView from './components/AllGamesView';
+import UpdatesView from './components/UpdatesView';
 import { timestamp } from './format';
 import { readRoute, routeURL } from './navigation';
 
@@ -19,8 +21,8 @@ function Dashboard() {
   const { data, error, loading } = overview;
   const sourceTime = data.games[0]?.playersUpdatedAt;
   const stale = !!sourceTime && Date.now() / 1000 - sourceTime > 600;
-  const cached = !!(error || stale || data.message);
-  const status = error ? 'Reconnecting' : data.refreshing ? 'Updating' : stale ? 'Saved data' : data.message ? 'Partial data' : 'Connected';
+  const cached = !!(error || stale || data.playersStatus === 'reconnecting');
+  const status = error || data.playersStatus === 'reconnecting' ? 'Reconnecting' : stale ? 'Saved counts' : data.playersStatus === 'connecting' || loading ? 'Connecting' : 'Connected';
 
   useEffect(() => {
     const sync = () => setRoute(readRoute());
@@ -37,7 +39,7 @@ function Dashboard() {
     setMenuOpen(false);
     content.current?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: 'instant' });
-  }, [route.view, route.genre, route.browse]);
+  }, [route.view, route.genre]);
   useEffect(() => {
     if (!route.game && opener.current) {
       if (opener.current.isConnected) opener.current.focus({ preventScroll: true });
@@ -59,14 +61,16 @@ function Dashboard() {
 
   return <>
     <a className="skip-link" href="#main-content" onClick={event => { event.preventDefault(); content.current?.focus(); }}>Skip to content</a>
-    <Masthead status={status} cached={cached} menuOpen={menuOpen} onMenu={() => setMenuOpen(value => !value)}/>
+    <Masthead view={route.view} status={status} cached={cached} menuOpen={menuOpen} onMenu={() => setMenuOpen(value => !value)}/>
     {menuOpen && <button className="sidebar-backdrop" aria-label="Dismiss navigation" onClick={() => setMenuOpen(false)}/>}
     <Sidebar view={route.view} open={menuOpen} onNavigate={() => setMenuOpen(false)}/>
     <main id="main-content" className="workspace" ref={content} tabIndex={-1} inert={menuOpen}>
-      <div className="steam-updates"><span><span className={`status-dot ${cached ? 'cached' : ''}`}/>Steam updates</span><span>{sourceTime ? `${cached ? 'Last received' : 'Updated'} ${timestamp(sourceTime)}` : 'Connecting to Steam…'}</span></div>
+      <div className="steam-updates"><span><span className={`status-dot ${cached ? 'cached' : ''}`}/>Steam updates</span><span>{sourceTime ? `Steam data as of ${timestamp(sourceTime)}` : 'Connecting to Steam…'}</span></div>
       {(error || data.message) && <p className="notice" role="status">{error || data.message}</p>}
       {stale && !error && !data.message && <p className="notice" role="status">Showing saved player counts while Steam reconnects.</p>}
       {route.view === 'dashboard' ? <GamesView data={data} loading={loading} onOpen={openGame}/> :
+        route.view === 'all-games' ? <AllGamesView genres={data.genres} route={route} onNavigate={navigate} onOpen={openGame}/> :
+        route.view === 'updates' ? <UpdatesView games={data.games} route={route} onNavigate={navigate} onOpen={openGame}/> :
         route.view === 'genres' ? <GenresView data={data} route={route} onNavigate={navigate} onOpen={openGame}/> :
         <MostPlayed games={data.games} loading={loading} onOpen={openGame} cached={cached}/>}
       <footer className="page-footer"><span className="footer-brand">Gdaw<span>.</span></span><p>Discover your next game. Powered by Steam data.</p><span>Independent of Valve.</span></footer>

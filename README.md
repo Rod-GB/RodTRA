@@ -1,6 +1,6 @@
 # Gdaw
 
-A Steam discovery website with a crimson-and-black dashboard, genre browsing, a Most Played leaderboard, and game details with reviews and developer updates.
+A Steam discovery website with a crimson-and-black dashboard, a separate All Games library, genre browsing, a Most Played leaderboard, and a dedicated Updates feed.
 
 ## Project structure
 
@@ -22,6 +22,7 @@ frontend/
 .gitignore
 Dockerfile
 README.md
+CHANGELOG.md
 render.yaml
 ```
 
@@ -45,4 +46,15 @@ npm ci
 npm run build
 ```
 
-Run the C++ server from the project root so it can find `frontend/index.html` and the generated bundle. The UI requests `/api/games`, `/api/game`, `/api/reviews`, and `/api/patches` from that server.
+Run the C++ server from the project root so it can find `frontend/index.html` and the generated bundle. The UI requests `/api/games`, `/api/game`, `/api/reviews`, `/api/patches`, `/api/updates`, and `/api/update` from that server.
+
+## Refresh behavior
+
+- Player counts are requested every 30 seconds in a dedicated worker. Browser pages check the backend cache every 10 seconds. Steam's own caching can affect the freshness of returned data, and failed requests use a longer retry delay.
+- Chart history is sampled and saved every 15 minutes. The history cleanup uses a timestamp index.
+- Overall ratings use all languages; displayed review pages use English. Reviews are refreshed on opening and periodically afterward using the supported Steam API.
+- The Updates feed checks small batches of tracked games while the feed is being viewed. Full posts load inside Gdaw, without a shortened blurb.
+- Matching content requests share a cache. Failed refreshes retain available cached content.
+- Temporary database connection failures at startup allow live Steam loading while the database retries. Invalid database configuration remains an explicit startup error.
+
+The current collection remains Steam's top 100. Additional collections, developer accounts, diagnostics storage, and MEGA integration are postponed.

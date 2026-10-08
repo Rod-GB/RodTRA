@@ -15,6 +15,7 @@ static long long lastPruned = 0;
 static void prepareHistory() {
     if (historyReady) return;
     executeSql("CREATE TABLE IF NOT EXISTS player_history (app_id INTEGER NOT NULL, time INTEGER NOT NULL, players INTEGER NOT NULL, PRIMARY KEY(app_id, time))");
+    executeSql("CREATE INDEX IF NOT EXISTS player_history_time ON player_history(time)");
     historyReady = true;
 }
 
@@ -106,8 +107,8 @@ bool saveGames(const std::vector<Game>& games) {
             executeSql("DELETE FROM player_history WHERE time < ?", {{{"type", "integer"}, {"value", std::to_string(now - 5 * 86400)}}});
             lastPruned = now;
         }
-        auto summary = games;
-        for (auto& game : summary) { game.history.clear(); game.reviews.clear(); }
+        std::vector<Game> summary;
+        for (const auto& game : games) summary.push_back(gameSummary(game));
         const std::string payload = Json({{"version", 1}, {"games", summary}}).dump();
         if (payload == lastSaved) return true;
         const Json data = {{{"type", "text"}, {"value", payload}}};

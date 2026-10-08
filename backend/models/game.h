@@ -40,3 +40,24 @@ struct Game {
 inline double positivePercent(const Game& game) {
     return game.totalReviews > 0 ? 100.0 * game.positiveReviews / game.totalReviews : -1.0;
 }
+
+// Copy card fields without allocating chart history or review text.
+inline Game gameSummary(const Game& source, bool includeDescription = true) {
+    Game game;
+    game.appID = source.appID;
+    game.currentPlayers = source.currentPlayers;
+    game.peakToday = source.peakToday;
+    game.title = source.title;
+    game.type = source.type;
+    game.image = source.image;
+    if (includeDescription) game.description = source.description;
+    game.releaseDate = source.releaseDate;
+    game.genres = source.genres;
+    game.positiveReviews = source.positiveReviews;
+    game.totalReviews = source.totalReviews;
+    game.rating = source.rating;
+    game.playersUpdatedAt = source.playersUpdatedAt;
+    game.detailsUpdatedAt = source.detailsUpdatedAt;
+    game.reviewsUpdatedAt = source.reviewsUpdatedAt;
+    return game;
+}

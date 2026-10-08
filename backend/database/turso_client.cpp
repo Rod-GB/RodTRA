@@ -17,6 +17,13 @@ static std::string databaseURL() {
     return url + "/v2/pipeline";
 }
 
+void validateDatabaseSettings() {
+    databaseURL();
+    const char* token = std::getenv("TURSO_AUTH_TOKEN");
+    if (!token || !*token || std::string(token).find_first_of("\r\n") != std::string::npos)
+        throw std::runtime_error("Set TURSO_AUTH_TOKEN in the server environment.");
+}
+
 Json executeSql(const std::string& sql, const Json& arguments) {
     const std::string url = databaseURL();
     const char* token = std::getenv("TURSO_AUTH_TOKEN");
@@ -28,7 +35,10 @@ Json executeSql(const std::string& sql, const Json& arguments) {
     }}};
     const Json results = requestJson(url, payload, token).at("results");
     if (results.size() != 2 || results.at(0).value("type", "") != "ok" ||
-        results.at(1).value("type", "") != "ok")
-        throw std::runtime_error("Database request failed; saved history is retained.");
+        results.at(1).value("type", "") != "ok") {
+        const std::string code = results.empty() ? "" : results.at(0).value("error", Json::object()).value("code", "");
+        const bool configuration = code.find("AUTH") != std::string::npos || code.find("SQL_PARSE") != std::string::npos;
+        throw OnlineError("Database request failed; saved history is retained.", !configuration, 60);
+    }
     return results.at(0).at("response").at("result");
 }

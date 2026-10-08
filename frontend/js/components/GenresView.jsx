@@ -12,7 +12,7 @@ function GenreExplorer({ route, genres, onNavigate, onOpen }) {
   useEffect(() => setLimit(20), [route.search, route.genre, route.sort]);
   const reset = () => onNavigate({ search: '', sort: 'players' }, true);
   return <>
-    <div className="genre-filter-panel"><GameToolbar search={route.search} genre={route.genre} sort={route.sort} genres={genres} onSearch={search => onNavigate({ search }, true)} onGenre={genre => onNavigate({ genre, browse: !genre, search: '' })} onSort={sort => onNavigate({ sort }, true)} onReset={reset}/></div>
+    <div className="genre-filter-panel"><GameToolbar baseGenre={route.genre} search={route.search} genre={route.genre} sort={route.sort} genres={genres} onSearch={search => onNavigate({ search }, true)} onGenre={genre => onNavigate({ genre, search: '' })} onSort={sort => onNavigate({ sort }, true)} onReset={reset}/></div>
     <div className="lineup-meta"><p role="status" aria-live="polite">{result.loading ? 'Finding games…' : `${result.data.games.length} games found`}</p><span>{route.sort === 'rating' ? 'Highest rated first' : route.sort === 'title' ? 'A–Z' : 'Most players first'}</span></div>
     {result.error && <p className="notice" role="status">{result.error}</p>}
     <div className="genre-results">{result.data.games.slice(0, limit).map(game => <article className="genre-result" key={game.appID}>
@@ -28,10 +28,10 @@ function GenreExplorer({ route, genres, onNavigate, onOpen }) {
 }
 
 export default function GenresView({ data, route, onNavigate, onOpen }) {
-  const browsing = !!route.genre || route.browse || !!route.search;
+  const browsing = !!route.genre;
   return <section className="genres-view" aria-labelledby="genres-title">
     <div className="page-heading"><div><p className="eyebrow">Explore by genre</p><h1 id="genres-title">{browsing ? route.genre || 'All games' : <>Play your <span>way.</span></>}</h1><p>{browsing ? 'Find a game that fits your mood.' : 'Choose a world to get lost in. Every genre is a different adventure.'}</p></div>
-      <a className="secondary-button" href={browsing ? '#/genres' : '#/genres?browse=all'}>{browsing ? '← All genres' : 'Browse all games'}{!browsing && <Icon name="arrow"/>}</a>
+      {browsing && <a className="secondary-button" href="#/genres">← All genres</a>}
     </div>
     {browsing ? <GenreExplorer route={route} genres={data.genres} onNavigate={onNavigate} onOpen={onOpen}/> : <>
       <div className="genre-intro"><span>{data.genres.length} genres</span><p>From the games we collect in Steam’s top 100.</p></div>

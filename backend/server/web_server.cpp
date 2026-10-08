@@ -1,6 +1,7 @@
 #include "web_server.h"
 #include "api_routes.h"
 #include "content_routes.h"
+#include "../services/updates_feed.h"
 #include "../config/settings.h"
 #include <httplib.h>
 #include <fstream>
@@ -16,7 +17,7 @@ static Query queryParameters(const httplib::Request& request) {
 // the library handles HTTP; our code chooses the public files and API routes.
 void runWebsiteServer(DashboardState& state) {
     httplib::Server server;
-    server.new_task_queue = [] { return new httplib::ThreadPool(4); };
+    server.new_task_queue = [] { return new httplib::ThreadPool(4, 8, 64); };
     server.set_read_timeout(5, 0);
     server.set_write_timeout(5, 0);
     server.set_payload_max_length(8192);
@@ -28,6 +29,16 @@ void runWebsiteServer(DashboardState& state) {
     server.Get("/api/game", [&](const auto& request, auto& response) {
         const Json body = gameResponse(state, queryParameters(request));
         response.status = body.contains("error") ? 404 : 200;
+        response.set_content(body.dump(), "application/json; charset=utf-8");
+    });
+    server.Get("/api/updates", [&](const auto& request, auto& response) {
+        const auto body = updatesResponse(state, queryParameters(request));
+        response.status = body.contains("error") ? 400 : 200;
+        response.set_content(body.dump(), "application/json; charset=utf-8");
+    });
+    server.Get("/api/update", [&](const auto& request, auto& response) {
+        const auto body = updatePostResponse(state, queryParameters(request));
+        response.status = body.contains("error") ? 503 : 200;
         response.set_content(body.dump(), "application/json; charset=utf-8");
     });
     for (bool patches : {false, true}) {

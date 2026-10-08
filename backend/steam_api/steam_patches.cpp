@@ -4,9 +4,9 @@
 #include <algorithm>
 
 // use the developer announcement feed, excluding outside news websites.
-Json fetchSteamPatches(int appID, long long before) {
+Json fetchSteamPatches(int appID, long long before, int count) {
     std::string url = "https://api.steampowered.com/ISteamNews/GetNewsForApp/v2/?appid=" +
-        std::to_string(appID) + "&count=12&maxlength=3000&feeds=steam_community_announcements";
+        std::to_string(appID) + "&count=" + std::to_string(count) + "&maxlength=0&feeds=steam_community_announcements";
     if (before > 0) url += "&enddate=" + std::to_string(before);
     const Json source = requestJson(url).at("appnews").at("newsitems");
     Json posts = Json::array();
@@ -28,5 +28,5 @@ Json fetchSteamPatches(int appID, long long before) {
             {"url", link}});
     }
     return {{"posts", posts}, {"before", oldest > 0 ? oldest - 1 : 0},
-        {"hasMore", source.size() >= 12 && oldest > 1}, {"updatedAt", std::time(nullptr)}};
+        {"hasMore", source.size() >= static_cast<std::size_t>(count) && oldest > 1}, {"updatedAt", std::time(nullptr)}};
 }

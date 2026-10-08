@@ -50,6 +50,80 @@
 @media(max-width:480px){.workspace{padding-inline:16px}.page-heading h1{font-size:31px;letter-spacing:-1px}.overview-stats{grid-template-columns:1fr 1fr}.overview-stats>div:nth-child(2){grid-column:1 / -1;grid-row:2}.overview-stats>div{padding:14px}.overview-stats>div:nth-child(2) .stat-icon{display:grid}.overview-stats strong{font-size:24px}.section-heading{align-items:flex-start}.section-heading h2{font-size:21px}.section-heading p{font-size:12px;max-width:180px}.section-heading .secondary-button{font-size:12px;padding:9px 10px;gap:6px}.game-grid{grid-template-columns:1fr;gap:18px}.card-content h3{min-height:0;font-size:20px}.card-content{padding:20px 20px 0}.card-genre{font-size:11px}.player-number{font-size:25px}.card-rating .rating{font-size:20px}.card-footer .text-link{font-size:14px}.discovery-banner{padding:20px;gap:14px}.discovery-banner>div{flex:1;min-width:160px}.discovery-banner h3{font-size:17px}.banner-link{margin-left:0}.genre-grid{grid-template-columns:1fr}.genre-intro{gap:12px;align-items:flex-start;font-size:12px}.genre-intro>span{flex-shrink:0}.genre-filter-panel{padding:12px}.genre-select select,.sort-select select{min-width:0;font-size:12px}.genre-result{grid-template-columns:86px minmax(0,1fr) 34px;padding:12px;gap:10px}.result-art{grid-row:1 / span 2;align-self:start}.result-description h2{font-size:15px}.result-description p{font-size:11px}.result-open{grid-column:3;grid-row:1;width:34px;height:34px}.result-players{grid-column:2;grid-row:2}.result-players strong{font-size:16px}.result-players>span{display:inline;margin-left:5px;font-size:10px}.result-rating{grid-column:2;grid-row:3;margin:0}.result-rating .rating{font-size:12px}.result-rating .rating>span{display:inline;margin-left:6px;font-size:10px}.podium{grid-template-columns:1fr;gap:12px}.podium-card{display:grid;grid-template-columns:115px minmax(0,1fr)}.podium-art{aspect-ratio:auto;height:100%;min-height:105px}.podium-content{padding:14px 16px}.podium-content h2{min-height:0;font-size:16px;margin-bottom:8px}.podium-content strong{font-size:21px}.leaderboard td,.leaderboard th{padding:12px}.page-footer>span:last-child{margin-left:0;flex-basis:100%}.page-footer p{font-size:11px}.game-dialog{width:calc(100% - 16px);max-height:95dvh;padding:18px;border-radius:13px}.detail-header{margin:-18px -18px 0;height:255px}.detail-header>div{padding:70px 18px 20px}.detail-nav{top:-18px;gap:25px}.detail-stats{gap:14px;padding:16px;grid-template-columns:1fr 1fr}.detail-stats>div:last-child{grid-column:1 / -1;padding-top:12px;border-top:1px solid var(--line)}.detail-stats strong,.detail-stats .rating{font-size:24px}.reviews-heading{align-items:flex-start;gap:12px}.reviews-heading h3{font-size:21px}.review-card{padding:18px}.review-top{flex-wrap:wrap}.patch-list{padding-left:15px;margin-left:4px}.patch-card{padding:18px}.patch-card::before{left:-21px}.patch-card h4{font-size:20px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
+/* Center the shared icon and distinguish the two top-level pages. */
+.brand-mark { overflow: hidden; letter-spacing: 0; line-height: 1; }
+.brand-mark img { display: block; width: 100%; height: 100%; }
+.main-nav { display: flex; gap: 28px; }
+.main-nav a { border-bottom-color: transparent; color: var(--muted); }
+.main-nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); }
+
+/* The All Games library has a separate browsing layout. */
+.library-total { font-size: 34px; font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.library-total > span { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.library-toolbar { padding: 18px; border-radius: 13px; background: var(--panel); border: 1px solid var(--line); }
+.library-list { display: grid; gap: 16px; }
+.library-row { display: grid; grid-template-columns: 170px minmax(0, 1fr) 140px 125px; align-items: center; gap: 22px; padding: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; }
+.library-row:hover { border-color: #74404e; }
+.library-art { padding: 0; border-radius: 9px; aspect-ratio: 616/353; overflow: hidden; background: var(--surface); }
+.library-art img { width: 100%; height: 100%; object-fit: cover; }
+.library-info { min-width: 0; }
+.library-id { font-size: 10px; letter-spacing: 1px; color: var(--muted); }
+.library-info h2 { font-size: 20px; margin: 6px 0 12px; overflow-wrap: anywhere; }
+.library-info h2 button { font: inherit; text-align: left; background: transparent; padding: 0; }
+.library-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.library-tags > span { background: #25212a; border-radius: 5px; padding: 3px 7px; color: #c5c5d3; font-size: 10px; }
+.library-metrics { display: grid; gap: 10px; }
+.library-metrics strong { display: block; font-size: 19px; font-variant-numeric: tabular-nums; }
+.library-metrics span { display: block; font-size: 11px; color: var(--muted); }
+.library-metrics > div:last-child strong { color: #c5c5d3; font-size: 15px; }
+.library-actions { display: grid; gap: 14px; text-align: right; }
+.library-actions .rating { font-size: 17px; }
+.library-actions .secondary-button { padding: 8px 12px; font-size: 12px; }
+
+/* Developer feed controls and complete post content. */
+.feed-controls { display: flex; flex-wrap: wrap; gap: 18px; padding: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 13px; }
+.feed-controls label { flex: 1; min-width: 170px; font-size: 12px; color: var(--muted); }
+.feed-controls select { display: block; width: 100%; margin-top: 7px; padding: 12px; min-height: 44px; background: var(--bg); color: var(--text); border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+.updates-timeline { display: grid; gap: 24px; margin-left: 6px; padding-left: 22px; border-left: 1px solid #58313c; }
+.updates-timeline:empty { display: none; }
+.feed-game { display: flex; align-items: center; width: 100%; gap: 12px; padding: 0 0 16px; margin-bottom: 18px; background: transparent; border-bottom: 1px solid var(--line); text-align: left; font-size: 14px; font-weight: 600; }
+.feed-game img { width: 66px; aspect-ratio: 616/353; object-fit: cover; border-radius: 5px; }
+.feed-game > svg { margin-left: auto; }
+.feed-game:hover { color: #ff8b9e; }
+.new-posts-button { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: 100%; padding: 14px 18px; margin: 0 0 22px; border: 1px solid #8b2f45; border-radius: 10px; background: #341622; color: var(--text); text-align: left; font-size: 14px; }
+.feed-note { color: var(--muted); font-size: 12px; margin-top: 28px; }
+.update-loading { margin-top: 16px; }
+.patch-body { white-space: normal; }
+.patch-body a { color: #ff9bad; text-decoration: underline; text-underline-offset: 3px; }
+.patch-body .update-image { max-width: 100%; height: auto; border-radius: 9px; margin: 18px auto; }
+.patch-body blockquote { border-left: 3px solid #84505e; padding-left: 18px; margin: 18px 0; color: #bfc0cf; }
+.patch-body pre { white-space: pre-wrap; padding: 16px; background: var(--bg); border-radius: 9px; font-size: 13px; }
+.patch-body code { overflow-wrap: anywhere; }
+.update-table-scroll { position: relative; width: 100%; overflow-x: auto; margin: 18px 0; }
+.update-table-scroll table { border-collapse: collapse; font-size: 13px; width: 100%; }
+.update-table-scroll th, .update-table-scroll td { border: 1px solid var(--line); padding: 10px; text-align: left; }
+@media(max-width:1100px) {
+  .library-row { grid-template-columns: 140px minmax(0, 1fr) 110px; gap: 16px; }
+  .library-actions { grid-column: 2 / -1; display: flex; align-items: center; justify-content: space-between; text-align: left; }
+  .library-art { align-self: start; }
+}
+@media(max-width:720px) {
+  .masthead { gap: 10px; padding-inline: 14px; }
+  .main-nav { gap: 16px; }
+  .brand { font-size: 22px; gap: 8px; }
+  .library-total { text-align: left; font-size: 27px; }
+}
+@media(max-width:480px) {
+  .library-row { grid-template-columns: 105px minmax(0, 1fr); gap: 14px; padding: 14px; }
+  .library-info h2 { font-size: 17px; }
+  .library-metrics { grid-column: 1 / -1; display: flex; gap: 30px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .library-actions { grid-column: 1 / -1; }
+  .library-toolbar, .feed-controls { padding: 13px; }
+  .updates-timeline { padding-left: 15px; margin-left: 4px; }
+  .feed-controls label { min-width: 100%; }
+  .updates-view .lineup-meta { flex-direction: column; gap: 6px; }
+}
+
 /* Keep player counts visible in the phone leaderboard. */
 @media(max-width:720px){
   .sidebar{transition:transform .3s ease,visibility 0s .3s}

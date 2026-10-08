@@ -3,6 +3,7 @@
 #include "../steam_api/steam_patches.h"
 #include "../services/content_cache.h"
 #include <ctime>
+#include "../config/settings.h"
 
 Json contentResponse(DashboardState& state, const Query& query, bool patches) {
     int appID = 0;
@@ -23,14 +24,14 @@ Json contentResponse(DashboardState& state, const Query& query, bool patches) {
                 return {{"error", "Invalid update date."}};
             const long long before = value.empty() ? 0 : std::stoll(value);
             if (before < 0 || before > std::time(nullptr)) return {{"error", "Invalid update date."}};
-            return cachedSteamContent("patches:" + id + ':' + value, 600, [&] { return fetchSteamPatches(appID, before); });
+            return cachedSteamContent("patches:full:" + id + ':' + value, ContentRefreshSeconds, [&] { return fetchSteamPatches(appID, before); });
         }
         auto cursor = queryValue(query, "cursor");
         if (cursor.empty()) cursor = "*";
         if (cursor.size() > 1024) return {{"error", "Invalid review page."}};
         const auto sort = queryValue(query, "sort");
         if (!sort.empty() && sort != "recent" && sort != "helpful") return {{"error", "Invalid review order."}};
-        return cachedSteamContent("reviews:" + id + ':' + sort + ':' + cursor, 120,
+        return cachedSteamContent("reviews:" + id + ':' + sort + ':' + cursor, ReviewRefreshSeconds,
             [&] { return fetchSteamReviewPage(appID, sort, cursor); });
     } catch (...) { return {{"error", patches ? "Steam updates are temporarily unavailable. Try again." : "Steam reviews are temporarily unavailable. Try again."}}; }
 }

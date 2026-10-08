@@ -35,13 +35,14 @@ add_executable(rodtra
   database/game_store.cpp
   services/refresh_games.cpp
   services/content_cache.cpp
+  services/updates_feed.cpp
   server/api_routes.cpp
   server/content_routes.cpp
   server/web_server.cpp
 )
 target_link_libraries(rodtra PRIVATE nlohmann_json::nlohmann_json httplib::httplib CURL::libcurl Threads::Threads)
 if(MSVC)
-  target_compile_definitions(rodtra PRIVATE _CRT_SECURE_NO_WARNINGS)
+  target_compile_definitions(rodtra PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX)
   target_compile_options(rodtra PRIVATE /W4 /utf-8)
 else()
   target_compile_options(rodtra PRIVATE -Wall -Wextra -Wpedantic)

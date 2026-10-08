@@ -33,6 +33,6 @@ export default function PlayerChart({ game, large = false }) {
         </AreaChart>
       </ResponsiveContainer> : <p className="empty-chart">No readings in this range.</p>}
     </div>
-    <p className="chart-note">{points.length === 1 ? 'First reading saved. Waiting for the next update.' : `${number(points.length)} readings · Hover or tap for details.`}</p>
+    <p className="chart-note">{points.length === 1 ? 'First history sample saved.' : `${number(points.length)} readings · Hover or tap for details.`} History is sampled every {Math.round((game.historySaveSeconds || 900) / 60)} minutes; player counts refresh independently.</p>
   </section>;
 }

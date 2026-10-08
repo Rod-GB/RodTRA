@@ -27,8 +27,10 @@ export function useGames(search, genre, sort) {
         }
       }
     }
-    const delay = setTimeout(() => { fetchGames(); interval = setInterval(fetchGames, 15000); }, 200);
-    return () => { stopped = true; clearTimeout(delay); clearInterval(interval); controller?.abort(); };
+    const visibleUpdate = () => { if (!document.hidden) fetchGames(); };
+    const delay = setTimeout(() => { fetchGames(); interval = setInterval(visibleUpdate, 10000); }, 200);
+    document.addEventListener('visibilitychange', visibleUpdate);
+    return () => { stopped = true; clearTimeout(delay); clearInterval(interval); controller?.abort(); document.removeEventListener('visibilitychange', visibleUpdate); };
   }, [search, genre, sort]);
   return { data, error, loading };
 }
