@@ -35,7 +35,6 @@ add_executable(rodtra
   database/game_store.cpp
   services/refresh_games.cpp
   services/content_cache.cpp
-  services/updates_feed.cpp
   server/api_routes.cpp
   server/content_routes.cpp
   server/web_server.cpp

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 
 // C++ handles searching, filtering and sorting through this request.
-export function useGames(search, genre, sort) {
+export function useGames(search, genre, sort, enabled = true) {
   const [data, setData] = useState({ games: [], genres: [], trackedGames: 0, refreshing: true });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
   useEffect(() => {
+    if (!enabled) { setLoading(false); return; }
     setLoading(true);
     setData(previous => ({ ...previous, games: [] }));
     let stopped = false;
@@ -31,6 +32,6 @@ export function useGames(search, genre, sort) {
     const delay = setTimeout(() => { fetchGames(); interval = setInterval(visibleUpdate, 10000); }, 200);
     document.addEventListener('visibilitychange', visibleUpdate);
     return () => { stopped = true; clearTimeout(delay); clearInterval(interval); controller?.abort(); document.removeEventListener('visibilitychange', visibleUpdate); };
-  }, [search, genre, sort]);
+  }, [search, genre, sort, enabled]);
   return { data, error, loading };
 }

@@ -1,6 +1,6 @@
 # Gdaw
 
-A Steam discovery website with a crimson-and-black dashboard, a separate All Games library, genre browsing, a Most Played leaderboard, and a dedicated Updates feed.
+A Steam discovery website with a crimson-and-black dashboard, an All Games library, click-to-browse genres, a Most Played leaderboard, and website release notes under Updates.
 
 ## Project structure
 
@@ -43,17 +43,24 @@ GitHub stores the source. The website needs a host that runs its C++ server, suc
 ```sh
 cd frontend
 npm ci
+npm test
 npm run build
 ```
 
-Run the C++ server from the project root so it can find `frontend/index.html` and the generated bundle. The UI requests `/api/games`, `/api/game`, `/api/reviews`, `/api/patches`, `/api/updates`, and `/api/update` from that server.
+Run the C++ server from the project root so it can find `frontend/index.html` and the generated bundle. Game screens request `/api/games`, `/api/game`, `/api/reviews`, and `/api/patches` from that server.
+
+## Website Updates and Genres
+
+- Updates displays website changes from `CHANGELOG.md`, bundled into the frontend. Add an entry headed `## YYYY-MM-DD | Title`, followed by `### Improvements` or `### Fixes` and bullet points, then rebuild to publish the new notes.
+- Genres displays category tiles. Click one to see only that genre's game cards; use All genres to return. Search and sorting remain in All Games.
+- Game-specific Steam posts are available under Patch notes inside a game's details. The old shared game-update collector and `/api/updates` and `/api/update` routes have been removed.
 
 ## Refresh behavior
 
 - Player counts are requested every 30 seconds in a dedicated worker. Browser pages check the backend cache every 10 seconds. Steam's own caching can affect the freshness of returned data, and failed requests use a longer retry delay.
 - Chart history is sampled and saved every 15 minutes. The history cleanup uses a timestamp index.
 - Overall ratings use all languages; displayed review pages use English. Reviews are refreshed on opening and periodically afterward using the supported Steam API.
-- The Updates feed checks small batches of tracked games while the feed is being viewed. Full posts load inside Gdaw, without a shortened blurb.
+- A game's Patch notes tab loads complete Steam developer posts on demand. The website Updates page uses the bundled changelog and makes no Steam requests.
 - Matching content requests share a cache. Failed refreshes retain available cached content.
 - Temporary database connection failures at startup allow live Steam loading while the database retries. Invalid database configuration remains an explicit startup error.
 

@@ -17,7 +17,7 @@ function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const content = useRef(null);
   const opener = useRef(null);
-  const overview = useGames('', '', 'players');
+  const overview = useGames('', '', 'players', route.view !== 'updates');
   const { data, error, loading } = overview;
   const sourceTime = data.games[0]?.playersUpdatedAt;
   const stale = !!sourceTime && Date.now() / 1000 - sourceTime > 600;
@@ -65,13 +65,15 @@ function Dashboard() {
     {menuOpen && <button className="sidebar-backdrop" aria-label="Dismiss navigation" onClick={() => setMenuOpen(false)}/>}
     <Sidebar view={route.view} open={menuOpen} onNavigate={() => setMenuOpen(false)}/>
     <main id="main-content" className="workspace" ref={content} tabIndex={-1} inert={menuOpen}>
-      <div className="steam-updates"><span><span className={`status-dot ${cached ? 'cached' : ''}`}/>Steam updates</span><span>{sourceTime ? `Steam data as of ${timestamp(sourceTime)}` : 'Connecting to Steam…'}</span></div>
-      {(error || data.message) && <p className="notice" role="status">{error || data.message}</p>}
-      {stale && !error && !data.message && <p className="notice" role="status">Showing saved player counts while Steam reconnects.</p>}
+      {route.view !== 'updates' && <>
+        <div className="steam-updates"><span><span className={`status-dot ${cached ? 'cached' : ''}`}/>Steam data</span><span>{sourceTime ? `Steam data as of ${timestamp(sourceTime)}` : 'Connecting to Steam…'}</span></div>
+        {(error || data.message) && <p className="notice" role="status">{error || data.message}</p>}
+        {stale && !error && !data.message && <p className="notice" role="status">Showing saved player counts while Steam reconnects.</p>}
+      </>}
       {route.view === 'dashboard' ? <GamesView data={data} loading={loading} onOpen={openGame}/> :
         route.view === 'all-games' ? <AllGamesView genres={data.genres} route={route} onNavigate={navigate} onOpen={openGame}/> :
-        route.view === 'updates' ? <UpdatesView games={data.games} route={route} onNavigate={navigate} onOpen={openGame}/> :
-        route.view === 'genres' ? <GenresView data={data} route={route} onNavigate={navigate} onOpen={openGame}/> :
+        route.view === 'updates' ? <UpdatesView/> :
+        route.view === 'genres' ? <GenresView data={data} route={route} loading={loading} onOpen={openGame}/> :
         <MostPlayed games={data.games} loading={loading} onOpen={openGame} cached={cached}/>}
       <footer className="page-footer"><span className="footer-brand">Gdaw<span>.</span></span><p>Discover your next game. Powered by Steam data.</p><span>Independent of Valve.</span></footer>
     </main>

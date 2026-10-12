@@ -17,10 +17,6 @@ struct DashboardState {
     bool restorePending = false;
     int playerRetrySeconds = 30;
     long long lastCheckedAt = 0;
-    Json updates = Json::array();
-    long long updatesRequestedAt = 0, updatesCheckedAt = 0;
-    int updatesPreferredGame = 0;
-    std::string updatesMessage;
     std::atomic<bool> running{true};
     std::filesystem::path projectFolder;
 };

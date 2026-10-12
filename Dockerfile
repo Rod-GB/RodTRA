@@ -4,6 +4,7 @@ WORKDIR /frontend
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 COPY frontend/js ./js
+COPY CHANGELOG.md /CHANGELOG.md
 RUN npm run build
 
 FROM debian:bookworm-slim AS backend-build

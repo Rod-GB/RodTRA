@@ -1,7 +1,6 @@
 #include "web_server.h"
 #include "api_routes.h"
 #include "content_routes.h"
-#include "../services/updates_feed.h"
 #include "../config/settings.h"
 #include <httplib.h>
 #include <fstream>
@@ -29,16 +28,6 @@ void runWebsiteServer(DashboardState& state) {
     server.Get("/api/game", [&](const auto& request, auto& response) {
         const Json body = gameResponse(state, queryParameters(request));
         response.status = body.contains("error") ? 404 : 200;
-        response.set_content(body.dump(), "application/json; charset=utf-8");
-    });
-    server.Get("/api/updates", [&](const auto& request, auto& response) {
-        const auto body = updatesResponse(state, queryParameters(request));
-        response.status = body.contains("error") ? 400 : 200;
-        response.set_content(body.dump(), "application/json; charset=utf-8");
-    });
-    server.Get("/api/update", [&](const auto& request, auto& response) {
-        const auto body = updatePostResponse(state, queryParameters(request));
-        response.status = body.contains("error") ? 503 : 200;
         response.set_content(body.dump(), "application/json; charset=utf-8");
     });
     for (bool patches : {false, true}) {

@@ -1,29 +1,30 @@
-# Gdaw update — October 8, 2026
+# Gdaw website updates
 
-## Interface
+## 2026-10-12 | Simpler genres and clearer website updates
 
-- Set the browser title to `Gdaw` and centered the shared G icon in the header and favicon.
-- Added Updates beside Homepage with an independent developer-post feed and filters.
-- Moved All Games into its own sidebar entry and library layout, separate from Genres.
-- Preserved existing genre browsing and the Most Played leaderboard.
-- Added complete update text, supported formatting and Steam images, and optional source links.
-- Kept older loaded posts when refreshing, and merged edited content by its identifier.
+### Improvements
 
-## Backend
+- The Updates page now shows new features, improvements and fixes for the Gdaw website.
+- Choose a genre to see only its games, displayed as game cards.
+- Use All genres to return to the genre selection.
+- Search, genre filters and sorting are available in All Games.
 
-- Separated player-count refreshes from metadata, ratings, update collection, and history saving.
-- Set player-count checks to 30 seconds and browser cache checks to 10 seconds, with longer delays after failed requests.
-- Reduced chart sampling and database checkpoints to every 15 minutes.
-- Added an index for timestamp-based history cleanup.
-- Corrected overall ratings to use all-language totals and moved review pagination to the supported Steam API.
-- Coalesced matching content requests, bounded the cache, and retained stale content during temporary upstream failures.
-- Removed unnecessary chart/review serialization from game-list responses and shortened shared-data locks.
-- Added controlled startup recovery for temporary database failures while preserving configuration validation.
-- Collected update-feed metadata in small batches and fetched complete bodies on demand with `maxlength=0`.
+### Fixes
 
-## Scope and checks
+- Removed game announcements and game filters from the website Updates page.
+- Removed the search bar and dropdowns from genre pages.
+- Game-specific developer posts are clearly labeled Patch notes inside game details.
 
-- Diagnostics storage, MEGA integration, additional collections, and developer-platform features remain postponed.
-- Frontend builds, C++ compilation, backend regression checks, and compiled public Steam API checks completed during development.
-- Browser checks were stopped at the user's request; full browser validation was not completed.
-- Production Turso credentials and the Docker deployment were not tested. This package has not been committed, pushed, or deployed.
+## 2026-10-08 | More ways to discover games
+
+### Website features
+
+- All Games has its own library page for searching and browsing the Steam collection.
+- Discover games from the dashboard, explore genres or view the Most Played leaderboard.
+- Game details include player-history charts, ratings, English reviews and complete developer posts.
+- The Gdaw name and shared G icon appear in the browser tab and website header.
+
+### Improvements
+
+- Player counts refresh separately from game details and ratings.
+- Available game data and content stay visible during temporary connection problems.

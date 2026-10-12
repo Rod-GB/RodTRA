@@ -5,7 +5,6 @@
 #include "../steam_api/steam_reviews.h"
 #include "../database/game_store.h"
 #include "../network/http_client.h"
-#include "updates_feed.h"
 #include <thread>
 #include <chrono>
 #include <ctime>
@@ -233,7 +232,6 @@ void runAutomaticRefresh(DashboardState& state) {
     }
     std::thread metadata([&] { enrichGames(state); });
     std::thread storage([&] { storeGames(state); });
-    std::thread updates([&] { runUpdatesRefresh(state); });
     int failed = 0;
     while (state.running) {
         const auto started = std::chrono::steady_clock::now();
@@ -244,6 +242,6 @@ void runAutomaticRefresh(DashboardState& state) {
             std::chrono::steady_clock::now() - started).count());
         waitSeconds(state, std::max(1, interval - elapsed));
     }
-    metadata.join(); storage.join(); updates.join();
+    metadata.join(); storage.join();
 }
 
