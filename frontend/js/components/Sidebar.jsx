@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './Icon';
 
-const items = [['dashboard', 'Dashboard', 'dashboard'], ['all-games', 'All Games', 'library'], ['genres', 'Genres', 'genres'], ['most-played', 'Most Played', 'trophy']];
-const motionMilliseconds = 650;
+const items = [['dashboard', 'Dashboard', 'dashboard'], ['all-games', 'All Games', 'library'], ['genres', 'Genres', 'genres'], ['most-played', 'Most Played', 'trophy'], ['discounts', 'Discounts', 'library'], ['budget', 'Budget Finder', 'search']];
+const motionMilliseconds = 1000;
+const exitMilliseconds = 800;
 const mouseCanHover = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 export default function Sidebar({ view, open, onNavigate }) {
@@ -11,6 +12,7 @@ export default function Sidebar({ view, open, onNavigate }) {
   const phases = useRef({});
   const resetTimers = useRef(new Map());
   const touch = useRef(null);
+  const lastPointer = useRef('mouse'), navigationTimer = useRef(null);
 
   const setPhase = useCallback((key, phase) => {
     clearTimeout(resetTimers.current.get(key));
@@ -28,11 +30,12 @@ export default function Sidebar({ view, open, onNavigate }) {
     }
     setPhase(key, 'exit');
     // Also clear if a browser interrupts the CSS transition, such as for a long-press menu.
-    resetTimers.current.set(key, setTimeout(() => setPhase(key, 'idle'), motionMilliseconds + 80));
+    resetTimers.current.set(key, setTimeout(() => setPhase(key, 'idle'), exitMilliseconds + 80));
   }, [setPhase]);
 
-  const releaseTouch = useCallback(() => {
+  const releaseTouch = useCallback(event => {
     if (!touch.current) return;
+    if (event?.type === 'pointerup' && event.pointerId !== touch.current.id) return;
     const key = touch.current.key;
     touch.current = null;
     finishFeedback(key);
@@ -54,7 +57,7 @@ export default function Sidebar({ view, open, onNavigate }) {
     const hover = window.matchMedia('(hover: hover) and (pointer: fine)');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
     document.addEventListener('pointerdown', pressElsewhere, true);
-    for (const name of ['pointerup', 'pointercancel', 'scroll', 'contextmenu'])
+    for (const name of ['pointerup', 'pointercancel', 'scroll'])
       document.addEventListener(name, releaseTouch, true);
     document.addEventListener('visibilitychange', hideFeedback);
     window.addEventListener('blur', resetFeedback);
@@ -63,7 +66,7 @@ export default function Sidebar({ view, open, onNavigate }) {
     const timers = resetTimers.current;
     return () => {
       document.removeEventListener('pointerdown', pressElsewhere, true);
-      for (const name of ['pointerup', 'pointercancel', 'scroll', 'contextmenu'])
+      for (const name of ['pointerup', 'pointercancel', 'scroll'])
         document.removeEventListener(name, releaseTouch, true);
       document.removeEventListener('visibilitychange', hideFeedback);
       window.removeEventListener('blur', resetFeedback);
@@ -71,12 +74,14 @@ export default function Sidebar({ view, open, onNavigate }) {
       reducedMotion.removeEventListener('change', resetFeedback);
       for (const timer of timers.values()) clearTimeout(timer);
       timers.clear();
+      clearTimeout(navigationTimer.current);
     };
   }, [releaseTouch, resetFeedback]);
 
-  useEffect(() => { if (!open) resetFeedback(); }, [open, resetFeedback]);
+  useEffect(() => { if (!open) { resetFeedback(); clearTimeout(navigationTimer.current); } }, [open, resetFeedback]);
 
   const beginTouch = (event, key) => {
+    lastPointer.current = event.pointerType;
     if (event.pointerType === 'mouse') return;
     releaseTouch();
     if (!event.isPrimary) return;
@@ -87,7 +92,7 @@ export default function Sidebar({ view, open, onNavigate }) {
     const pressed = touch.current;
     if (!pressed || pressed.id !== event.pointerId) return;
     const bounds = pressed.element.getBoundingClientRect();
-    if (Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) > 8 ||
+    if (Math.hypot(event.clientX - pressed.x, event.clientY - pressed.y) > 24 ||
         event.clientX < bounds.left || event.clientX > bounds.right ||
         event.clientY < bounds.top || event.clientY > bounds.bottom) releaseTouch();
   };
@@ -108,7 +113,15 @@ export default function Sidebar({ view, open, onNavigate }) {
   }, [open]);
   return <aside id="sidebar" ref={sidebar} className={`sidebar ${open ? 'is-open' : ''}`} style={{ '--sidebar-motion-duration': `${motionMilliseconds}ms` }}>
     <p className="sidebar-caption">Explore</p>
-    <nav aria-label="Homepage sections">{items.map(([value, label, icon]) => <a key={value} href={`#/${value}`} className={`sidebar-link ${view === value ? 'is-active' : ''}`} data-feedback={feedback[value] || 'idle'} aria-current={view === value ? 'page' : undefined} onClick={onNavigate}
+    <nav aria-label="Homepage sections">{items.map(([value, label, icon]) => <a key={value} href={`#/${value}`} className={`sidebar-link ${view === value ? 'is-active' : ''}`} data-feedback={feedback[value] || 'idle'} aria-current={view === value ? 'page' : undefined}
+      onContextMenu={event => { if (touch.current?.key === value) event.preventDefault(); }}
+      onClick={event => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        if (open && lastPointer.current !== 'mouse' && event.detail !== 0) {
+          event.preventDefault(); releaseTouch(); clearTimeout(navigationTimer.current);
+          navigationTimer.current = setTimeout(() => { window.location.hash = `#/${value}`; onNavigate(); }, window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : exitMilliseconds);
+        } else onNavigate();
+      }}
       onPointerEnter={event => { if (event.pointerType === 'mouse' && mouseCanHover()) setPhase(value, 'enter'); }}
       onPointerLeave={event => {
         if (event.pointerType === 'mouse') {

@@ -1,4 +1,4 @@
-import { plainText, steamImage } from './format';
+import { plainText, gameImage } from './format';
 
 const escape = value => value.replace(/[&<>"]/g, letter => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[letter]));
 
@@ -10,7 +10,7 @@ export function safePostLink(value = '') {
 export function parsePatch(value = '') {
   const image = source => {
     const normalized = source.trim().replace(/\{STEAM_CLAN_IMAGE\}/g, 'https://clan.akamai.steamstatic.com/images').replace(/&amp;/g, '&');
-    const safe = steamImage(normalized);
+    const safe = gameImage(normalized);
     return safe ? `<span data-patch-image="${escape(safe)}"></span>` : '';
   };
   let html = value.replace(/\r\n?/g, '\n')

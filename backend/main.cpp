@@ -1,5 +1,6 @@
 #include "config/settings.h"
 #include "services/refresh_games.h"
+#include "services/discovery.h"
 #include "database/game_store.h"
 #include "database/turso_client.h"
 #include "network/http_client.h"
@@ -40,10 +41,12 @@ int main() {
     std::signal(SIGPIPE, SIG_IGN);
 #endif
     std::thread updater(runAutomaticRefresh, std::ref(state));
+    std::thread discovery(runDiscoveryRefresh, std::ref(state));
     int result = 0;
     try { runWebsiteServer(state); }
     catch (const std::exception& error) { std::cerr << error.what() << '\n'; result = 1; }
     state.running = false;
     updater.join();
+    discovery.join();
     return result;
 }

@@ -4,6 +4,7 @@
 #include <set>
 #include <stdexcept>
 #include <ctime>
+#include <algorithm>
 
 // discover Steam's current top 100; no hand-written game list.
 std::vector<Game> fetchSteamLeaderboard() {
@@ -18,6 +19,8 @@ std::vector<Game> fetchSteamLeaderboard() {
         game.appID = row.at("appid").get<int>();
         game.currentPlayers = row.at("concurrent_in_game").get<int>();
         game.peakToday = row.at("peak_in_game").get<int>();
+        // Keep the current reading consistent with the peak for this returned period.
+        if (game.peakToday >= 0) game.peakToday = std::max(game.peakToday, game.currentPlayers);
         game.playersUpdatedAt = time;
         if (game.appID > 0 && game.currentPlayers >= 0 && game.peakToday >= 0 && seen.insert(game.appID).second)
             games.push_back(game);

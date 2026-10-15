@@ -27,7 +27,7 @@ Json cachedSteamContent(const std::string& key, int seconds, const std::function
         }
         const auto failure = failures.find(key);
         if (failure != failures.end() && std::time(nullptr) < failure->second.retryAt) {
-            if (!stale.is_null()) { stale["message"] = "Showing saved content while Steam reconnects."; return stale; }
+            if (!stale.is_null()) { stale["message"] = "Showing saved content while the source reconnects."; return stale; }
             std::rethrow_exception(failure->second.error);
         }
         const auto active = pending.find(key);
@@ -74,7 +74,7 @@ Json cachedSteamContent(const std::string& key, int seconds, const std::function
             pending.erase(key);
         }
         if (!stale.is_null()) {
-            stale["message"] = "Showing saved content while Steam reconnects.";
+            stale["message"] = "Showing saved content while the source reconnects.";
             promise->set_value(stale);
             return stale;
         }

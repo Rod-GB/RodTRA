@@ -1,5 +1,6 @@
 import React from 'react';
 import Rating from './Rating';
+import Price from './Price';
 import { number, steamImage } from '../format';
 
 // C++ supplies the ordered records; each card opens live game details.
@@ -12,7 +13,8 @@ export default function GameCard({ game, rank, onOpen }) {
     <div className="card-content"><p className="card-genre">{game.genres.slice(0, 3).join(' · ') || 'Genre unavailable'}</p>
       <h3><button onClick={() => onOpen(game.appID)}>{game.title}</button></h3>
       <div className="card-metric"><span className="player-number">{number(game.currentPlayers)}<small>players now</small></span><div className="card-rating"><Rating game={game}/></div></div>
-      <div className="card-footer"><span>Peak today <strong>{number(game.peakToday)}</strong></span><button className="text-link" onClick={() => onOpen(game.appID)}>View stats</button></div>
+      <Price price={game.price}/>
+      <div className="card-footer"><span>Peak today <strong>{number(game.peakToday)}</strong></span><span>Total reviews<strong>{game.reviewsUpdatedAt ? number(game.totalReviews) : '—'}</strong></span><button className="text-link" onClick={() => onOpen(game.appID)}>View game</button></div>
     </div>
   </article>;
 }

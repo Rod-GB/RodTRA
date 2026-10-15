@@ -17,3 +17,12 @@ export function steamImage(url) {
     return parsed.protocol === 'https:' && /(^|\.)(steamstatic\.com|akamaihd\.net)$/.test(parsed.hostname) ? url : '';
   } catch { return ''; }
 }
+
+export function gameImage(url) {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && /(^|\.)(steamstatic\.com|akamaihd\.net|itch\.zone|epicgames\.com|unrealengine\.com)$/.test(parsed.hostname) ? parsed.href : '';
+  } catch { return ''; }
+}
+
+export const money = (cents, currency = 'PHP') => new Intl.NumberFormat(undefined, { style: 'currency', currency }).format(cents / 100);

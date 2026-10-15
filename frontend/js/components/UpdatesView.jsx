@@ -1,6 +1,7 @@
 import React from 'react';
 import changelog from '../../../CHANGELOG.md';
 import { parseWebsiteUpdates } from '../siteUpdates';
+import { version } from '../../package.json';
 
 const updates = parseWebsiteUpdates(changelog);
 const updateDate = value => new Intl.DateTimeFormat(undefined, {
@@ -12,7 +13,7 @@ export default function UpdatesView() {
     <div className="page-heading"><div>
       <p className="eyebrow">Gdaw changelog</p>
       <h1 id="updates-title">Website <span>updates.</span></h1>
-      <p>New features, improvements and fixes for Gdaw.</p>
+      <p>New features, improvements and fixes for Gdaw.</p><span className="version-badge">Version {version}</span>
     </div></div>
     <div className="site-updates-list">{updates.map((update, index) => <article className="site-update" key={update.date} aria-labelledby={`update-${update.date}`}>
       <div className="site-update-meta"><time dateTime={update.date}>{updateDate(update.date)}</time>{index === 0 && <span>Latest update</span>}</div>

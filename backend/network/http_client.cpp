@@ -36,7 +36,7 @@ static size_t receiveHeader(char* data, size_t size, size_t count, void* output)
 }
 
 // libcurl handles HTTPS; secret headers never appear in error messages.
-Json requestJson(const std::string& url, const Json& body, const std::string& token) {
+std::string requestText(const std::string& url, const Json& body, const std::string& token) {
     static CurlRuntime runtime;
     std::unique_ptr<CURL, decltype(&curl_easy_cleanup)> request(curl_easy_init(), curl_easy_cleanup);
     if (!request) throw OnlineError("HTTPS request could not start.", true);
@@ -76,7 +76,11 @@ Json requestJson(const std::string& url, const Json& body, const std::string& to
         if (status == 429) throw OnlineError("The data provider is temporarily limiting requests.", true, retryAfter);
         throw OnlineError("The data provider could not complete the request.", status >= 500, retryAfter);
     }
-    return Json::parse(response);
+    return response;
+}
+
+Json requestJson(const std::string& url, const Json& body, const std::string& token) {
+    return Json::parse(requestText(url, body, token));
 }
 
 std::string encodeURL(const std::string& text) {

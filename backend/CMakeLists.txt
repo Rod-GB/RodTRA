@@ -3,6 +3,7 @@ project(Gdaw LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(CURL REQUIRED)
+find_package(LibXml2 REQUIRED)
 find_package(Threads REQUIRED)
 
 # libraries download into the build folder, outside our source code.
@@ -35,11 +36,12 @@ add_executable(rodtra
   database/game_store.cpp
   services/refresh_games.cpp
   services/content_cache.cpp
+  services/discovery.cpp
   server/api_routes.cpp
   server/content_routes.cpp
   server/web_server.cpp
 )
-target_link_libraries(rodtra PRIVATE nlohmann_json::nlohmann_json httplib::httplib CURL::libcurl Threads::Threads)
+target_link_libraries(rodtra PRIVATE nlohmann_json::nlohmann_json httplib::httplib CURL::libcurl Threads::Threads LibXml2::LibXml2)
 if(MSVC)
   target_compile_definitions(rodtra PRIVATE _CRT_SECURE_NO_WARNINGS NOMINMAX)
   target_compile_options(rodtra PRIVATE /W4 /utf-8)

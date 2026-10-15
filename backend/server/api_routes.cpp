@@ -2,6 +2,7 @@
 #include "../algorithms/binary_search.h"
 #include "../algorithms/genre_filter.h"
 #include "../config/settings.h"
+#include "../services/discovery.h"
 #include <set>
 #include <ctime>
 
@@ -35,6 +36,7 @@ Json dashboardResponse(DashboardState& state, const Query& query) {
     Json cards = Json::array();
     for (const auto& game : games) {
         Json card = game;
+        card["price"] = steamDiscovery(game.appID).at("price");
         card.erase("history"); card.erase("reviews"); card.erase("description");
         cards.push_back(std::move(card));
     }
@@ -60,6 +62,8 @@ Json gameResponse(DashboardState& state, const Query& query) {
         if (binarySearchByAppID(ids, appID) < 0) return {{"error", "This game is not in the current Steam collection."}};
         selected = state.records.at(appID);
     }
-    return {{"game", selected}, {"historySaveSeconds", HistorySaveSeconds}};
+    Json game = selected;
+    game.update(steamDiscovery(appID, true));
+    return {{"game", game}, {"historySaveSeconds", HistorySaveSeconds}};
 }
 

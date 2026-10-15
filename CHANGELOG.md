@@ -1,5 +1,26 @@
 # Gdaw website updates
 
+## 2026-10-15 | Version 1.1.0 — Find your next game with confidence
+
+### Improvements
+
+- Find games in the existing Steam collection using a PHP budget, review rating and optional genres.
+- See Philippine prices, discounts and total reviews, with screenshots and simple game information.
+- Discover currently claimable Epic giveaways and up to 50 released itch.io listings.
+- Explore available itch.io ratings, public comments and creator devlogs.
+- Your Budget Finder inputs and results are temporary and are not saved.
+- Choose Steam, Epic Games or itch.io from the third control in All Games, or switch platforms in Genres.
+- Browse current Steam and itch.io sales in the separate Discounts page, with original prices, sale prices and percentages where supplied.
+- Epic giveaways show their original price and claim deadline when provided.
+
+### Fixes
+
+- Sidebar backgrounds fill more slowly from left to right and drain from right to left.
+- Touch holds retain the sidebar fill until release, and clickable text receives red feedback.
+- Shared labels now say Game data and Powered by GDAW.
+- Most Played bars compare each game's current players with its own peak today, with a visible percentage or At peak label.
+- Budget Finder shows every available Steam genre and a three-selection counter.
+
 ## 2026-10-12 | Simpler genres and clearer website updates
 
 ### Improvements

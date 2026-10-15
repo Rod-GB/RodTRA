@@ -12,4 +12,5 @@ public:
 };
 
 Json requestJson(const std::string& url, const Json& body = nullptr, const std::string& token = "");
+std::string requestText(const std::string& url, const Json& body = nullptr, const std::string& token = "");
 std::string encodeURL(const std::string& text);

@@ -9,7 +9,7 @@ RUN npm run build
 
 FROM debian:bookworm-slim AS backend-build
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential cmake ca-certificates libcurl4-openssl-dev \
+    build-essential cmake ca-certificates libcurl4-openssl-dev libxml2-dev \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /source
 COPY backend ./backend
@@ -17,7 +17,7 @@ RUN cmake -S backend -B build -DCMAKE_BUILD_TYPE=Release \
     && cmake --build build --parallel 2
 
 FROM debian:bookworm-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libcurl4 \
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libcurl4 libxml2 \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=backend-build /source/build/rodtra /usr/local/bin/rodtra

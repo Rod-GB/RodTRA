@@ -3,6 +3,9 @@ import PlayerChart from './PlayerChart';
 import Rating from './Rating';
 import ReviewsSection from './ReviewsSection';
 import PatchNotes from './PatchNotes';
+import Price from './Price';
+import ScreenshotGallery from './ScreenshotGallery';
+import GameMetadata from './GameMetadata';
 import { number, timestamp, plainText, steamImage } from '../format';
 
 // a game detail request uses C++ binary search.
@@ -28,7 +31,7 @@ export default function GameDetails({ appID, onClose, section = 'overview', onSe
     const interval = setInterval(update, 10000);
     return () => { stopped = true; controller?.abort(); clearInterval(interval); };
   }, [appID]);
-  return <dialog ref={dialog} className="game-dialog" aria-labelledby="detail-title" onClose={onClose} onClick={event => {
+  return <dialog ref={dialog} className="game-dialog" aria-labelledby="detail-title" onClose={event => { if (event.target === event.currentTarget) onClose(); }} onClick={event => {
     if (event.target === dialog.current) {
       const bounds = dialog.current.getBoundingClientRect();
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.current.close();
@@ -41,9 +44,12 @@ export default function GameDetails({ appID, onClose, section = 'overview', onSe
         <a className="store-link" href={`https://store.steampowered.com/app/${game.appID}/`} target="_blank" rel="noreferrer">Steam store</a></div></header>
       <nav className="detail-nav" aria-label="Game sections">{[['overview', 'Overview'], ['reviews', 'Reviews'], ['updates', 'Patch notes']].map(([tab, label]) => <button key={tab} aria-pressed={section === tab} onClick={() => onSection(tab)}>{label}</button>)}</nav>
       {section === 'overview' ? <><p className="game-description">{plainText(game.description)}</p>
-      <div className="detail-stats"><div><span>Players now</span><strong>{number(game.currentPlayers)}</strong></div><div><span>Peak today</span><strong>{number(game.peakToday)}</strong></div><div><span>Overall rating</span><Rating game={game}/></div></div>
+      <Price price={game.price} detailed/>
+      <ScreenshotGallery screenshots={game.screenshots} title={game.title}/>
+      <div className="detail-stats"><div><span>Players now</span><strong>{number(game.currentPlayers)}</strong></div><div><span>Peak today</span><strong>{number(game.peakToday)}</strong></div><div><span>Total reviews</span><strong>{game.reviewsUpdatedAt ? number(game.totalReviews) : '—'}</strong></div><div><span>Overall rating</span><Rating game={game}/></div></div>
       <p className="small muted">Steam player data: {timestamp(game.playersUpdatedAt)} · Released: {game.releaseDate || 'Not listed'}</p>
       <PlayerChart key={game.appID} game={game} large/>
+      <GameMetadata game={game}/>
       </> : section === 'reviews' ? <ReviewsSection game={game}/> : <PatchNotes appID={game.appID}/>}
     </>}
   </dialog>;

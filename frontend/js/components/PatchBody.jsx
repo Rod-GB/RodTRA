@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { parsePatch, safePostLink } from '../patchText';
-import { steamImage } from '../format';
+import { gameImage } from '../format';
 
 function content(node, key) {
   if (node.nodeType === 3) return node.textContent;
@@ -8,7 +8,7 @@ function content(node, key) {
   const tag = node.tagName.toLowerCase();
   if (['script','style','iframe','object','embed','form','input','button','link','meta'].includes(tag)) return null;
   const children = [...node.childNodes].map((child, index) => content(child, key + '-' + index));
-  if (node.dataset.patchImage) return steamImage(node.dataset.patchImage) ? <img key={key} className="update-image" src={steamImage(node.dataset.patchImage)} alt="Image from the developer update" loading="lazy"/> : null;
+  if (node.dataset.patchImage) return gameImage(node.dataset.patchImage) ? <img key={key} className="update-image" src={gameImage(node.dataset.patchImage)} alt="Image from the developer update" loading="lazy"/> : null;
   if (tag === 'a') {
     const href = safePostLink(node.getAttribute('href'));
     return href ? <a key={key} href={href} target="_blank" rel="noreferrer">{children}</a> : <React.Fragment key={key}>{children}</React.Fragment>;

@@ -16,6 +16,7 @@ export default function GamesView({ data, loading, onOpen }) {
       <div><span className="stat-icon"><Icon name="genres"/></span><div><span>Genres to explore</span><strong>{loading && !data.games.length ? '—' : number(data.genres.length)}</strong></div><a href="#/genres" aria-label="Explore genres"><Icon name="arrow"/></a></div>
     </div>
     <div className="section-heading"><div><h2>On your radar</h2><p>Something familiar. Something unexpected.</p></div><button className="secondary-button" onClick={shuffle} disabled={!data.games.length}><Icon name="shuffle"/> Shuffle games</button></div>
+    <a className="budget-entry" href="#/budget"><span><strong>Find games suitable for your budget</strong><small>Choose your budget and rating. Get matches with clear reasons.</small></span><Icon name="arrow"/></a>
     {loading && !picks.length ? <LoadingCards/> : <div className="game-grid">{picks.map(game => <GameCard key={game.appID} game={game} onOpen={onOpen}/>)}</div>}
     {!loading && !picks.length && <div className="empty-state"><Icon name="dashboard"/><h3>{data.refreshing ? 'Gathering Steam games' : 'No games available yet'}</h3><p>The collection will appear here when Steam data arrives.</p></div>}
     <a className="discovery-banner" href="#/most-played"><span className="banner-icon"><Icon name="trophy"/></span><div><h3>See where everyone is playing.</h3><p>Explore the ten most played games in our Steam collection.</p></div><span className="banner-link">View leaderboard <Icon name="arrow"/></span></a>
