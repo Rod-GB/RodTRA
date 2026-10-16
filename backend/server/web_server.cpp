@@ -23,6 +23,12 @@ void runWebsiteServer(DashboardState& state) {
     server.set_payload_max_length(8192);
     server.set_default_headers({{"Cache-Control", "no-store"}, {"X-Content-Type-Options", "nosniff"}});
     server.Get("/health", [](const auto&, auto& response) { response.set_content("OK", "text/plain"); });
+    server.Get("/api/catalog-summary", [&](const auto&, auto& response) {
+        response.set_content(catalogSummary(state).dump(), "application/json; charset=utf-8");
+    });
+    server.Get("/api/budget/options", [&](const auto&, auto& response) {
+        response.set_content(budgetOptions(state).dump(), "application/json; charset=utf-8");
+    });
     server.Post("/api/budget", [&](const auto& request, auto& response) {
         try {
             const auto input = Json::parse(request.body);
@@ -30,7 +36,7 @@ void runWebsiteServer(DashboardState& state) {
             response.set_content(budgetResponse(state, input).dump(), "application/json; charset=utf-8");
         } catch (...) {
             response.status = 400;
-            response.set_content("{\"error\":\"Check the budget, rating and genre choices. Maximum budget: PHP 100,000.\"}", "application/json; charset=utf-8");
+            response.set_content("{\"error\":\"Check the platform, currency, budget, rating and genre choices. Maximum budget: 100,000 in the selected currency.\"}", "application/json; charset=utf-8");
         }
     });
     for (const std::string store : {"epic", "itch"}) server.Get("/api/" + store, [store](const auto&, auto& response) {

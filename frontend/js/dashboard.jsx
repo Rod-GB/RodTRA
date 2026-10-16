@@ -19,7 +19,7 @@ function Dashboard() {
   const [menuOpen, setMenuOpen] = useState(false);
   const content = useRef(null);
   const opener = useRef(null);
-  const steamView = route.view !== 'updates' && route.platform === 'steam';
+  const steamView = !['updates', 'budget'].includes(route.view) && route.platform === 'steam';
   const overview = useGames('', '', 'players', steamView);
   const { data, error, loading } = overview;
   const sourceTime = data.games[0]?.playersUpdatedAt;
@@ -74,7 +74,7 @@ function Dashboard() {
         {stale && !error && !data.message && <p className="notice" role="status">Showing saved player counts while Steam reconnects.</p>}
       </>}
       {route.view === 'dashboard' ? <GamesView data={data} loading={loading} onOpen={openGame}/> :
-        route.view === 'budget' ? <BudgetFinder genres={data.genres} onOpen={openGame}/> :
+        route.view === 'budget' ? <BudgetFinder onOpen={openGame}/> :
         route.view === 'discounts' ? <DiscountsView route={route} onNavigate={navigate} onOpen={openGame}/> :
         route.view === 'all-games' ? <AllGamesView genres={data.genres} route={route} onNavigate={navigate} onOpen={openGame}/> :
         route.view === 'updates' ? <UpdatesView/> :

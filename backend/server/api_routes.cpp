@@ -17,7 +17,7 @@ Json dashboardResponse(DashboardState& state, const Query& query) {
     {
         std::lock_guard<std::mutex> lock(state.mutex);
         for (const auto& game : state.games) games.push_back(gameSummary(game, false));
-        status = {{"trackedGames", state.games.size()}, {"refreshing", state.refreshing}, {"message", state.message},
+        status = {{"trackedGames", state.games.size()}, {"rankedEntries", state.rankings.size()}, {"refreshing", state.refreshing}, {"message", state.message},
             {"lastCheckedAt", state.lastCheckedAt}, {"playersStatus", !state.playerMessage.empty() ? "reconnecting" :
                 state.rankings.empty() ? "connecting" : "connected"}};
     }

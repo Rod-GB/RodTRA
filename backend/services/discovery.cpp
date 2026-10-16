@@ -13,11 +13,18 @@
 #include <iomanip>
 #include <sstream>
 #include <locale>
+#include <iostream>
+
+static Json loadItchDetails(const Json& selected);
 
 namespace {
 std::mutex dataMutex;
 std::map<int, Json> steamData;
 std::map<int, long long> steamRetry;
+std::map<std::string, Json> itchSalePrices;
+long long salesCheckedAt = 0;
+std::string salesMessage = "Checking current itch.io offers…";
+std::string salesState = "loading";
 Json epic = {{"games", Json::array()}, {"updatedAt", 0}, {"message", "Connecting to Epic…"}};
 Json itch = {{"games", Json::array()}, {"updatedAt", 0}, {"message", "Connecting to itch.io…"}};
 
@@ -95,11 +102,12 @@ Json itchPrice(const Document& feed, xmlNodePtr item) {
     const auto final = listedCents(feed.text("price", item));
     const auto rate = feed.text("discountpercent", item);
     int discount = 0;
-    try { if (!rate.empty()) discount = std::stoi(rate); } catch (...) { return {{"available", false}}; }
+    try { if (!rate.empty()) { if (!std::regex_match(rate, std::regex("[0-9]{1,3}"))) return {{"available", false}}; discount = std::stoi(rate); } } catch (...) { return {{"available", false}}; }
     const auto original = discount > 0 ? listedCents(feed.text("fullPrice", item)) : final;
     const auto end = rssTime(feed.text("saleends", item));
+    if (original == 0 && final == 0) discount = 0;
     if (!std::regex_match(currency, std::regex("[A-Z]{3}")) || final < 0 || original < final || discount < 0 || discount > 100 ||
-        (discount > 0 && (original <= 0 || end <= std::time(nullptr)))) return {{"available", false}};
+        (discount > 0 && (original <= final || end <= std::time(nullptr)))) return {{"available", false}};
     return {{"available", true}, {"currency", currency}, {"final", final}, {"original", original}, {"discount", discount},
         {"free", final == 0}, {"freeLabel", "Free / pay what you want"}, {"endsAt", end}, {"checkedAt", std::time(nullptr)}, {"stale", false}};
 }
@@ -182,27 +190,75 @@ Json fetchEpic() {
 }
 
 Json fetchItch() {
+    return {{"games", parseItchListings(requestText("https://itch.io/games/newest/released.xml"))},
+        {"updatedAt", std::time(nullptr)}, {"message", ""}};
+}
+}
+
+Json parseItchListings(const std::string& xml) {
+    Document feed(xml);
+    if (feed.nodes("/rss/channel").empty()) throw std::runtime_error("The source did not return an RSS collection.");
     Json games = Json::array();
     std::set<std::string> seen;
-    auto append = [&](const std::string& url) {
-      Document feed(requestText(url));
-      for (auto* item : feed.nodes("/rss/channel/item")) {
+    for (auto* item : feed.nodes("/rss/channel/item")) {
         if (games.size() >= 50) break;
-        auto url = feed.text("link", item);
-        if (!itchURL(url) || !seen.insert(url).second) continue;
-        games.push_back({{"id", url}, {"url", url}, {"source", "itch"}, {"title", feed.text("plainTitle", item)},
-            {"description", feed.text("description", item)}, {"image", feed.text("imageurl", item)}, {"priceLabel", feed.text("price", item)},
-            {"currency", feed.text("currency", item)}, {"price", itchPrice(feed, item)}, {"genres", Json::array()},
-            {"platforms", feed.text("platforms", item)}, {"publisher", ""}, {"studio", ""}, {"releaseDate", ""}});
-        if (games.back()["title"] == "") games.back()["title"] = feed.text("title", item);
-      }
-    };
-    append("https://itch.io/games/newest/released.xml");
-    std::string message;
-    try { append("https://itch.io/games/newest/on-sale/released.xml"); }
-    catch (...) { message = "Sale listings could not refresh. Recent released games are available."; }
-    return {{"games", games}, {"updatedAt", std::time(nullptr)}, {"message", message}};
+        try {
+            const auto url = feed.text("link", item);
+            if (!itchURL(url) || !seen.insert(url).second) continue;
+            auto title = feed.text("plainTitle", item);
+            if (title.empty()) title = feed.text("title", item);
+            if (title.empty()) continue;
+            games.push_back({{"id", url}, {"url", url}, {"source", "itch"}, {"title", title},
+                {"description", feed.text("description", item)}, {"image", feed.text("imageurl", item)},
+                {"priceLabel", feed.text("price", item)}, {"currency", feed.text("currency", item)},
+                {"price", itchPrice(feed, item)}, {"genres", Json::array()}, {"status", "Released"},
+                {"publisher", ""}, {"studio", ""}, {"releaseDate", ""}, {"metadataCheckedAt", 0}});
+        } catch (...) { /* A bad listing must not discard the rest of a valid feed. */ }
+    }
+    return games; // Preserve itch.io's Most Recent order; sales are never appended.
 }
+
+Json parseItchPageMetadata(const std::string& html, const Json& listing) {
+    Document page(html, true);
+    Json result = {{"genres", Json::array()}, {"aiDisclosed", false}, {"aiDisclosure", "not-disclosed"},
+        {"eligible", true}, {"eligibilityReason", ""}, {"status", listing.value("status", "Released")}};
+    const auto info = "//div[contains(concat(' ',normalize-space(@class),' '),' game_info_panel_widget ')]";
+    if (page.nodes(info).empty()) throw std::runtime_error("Creator information could not be verified.");
+    const auto status = page.text(std::string(info) + "//tr[td[1][normalize-space(.)='Status']]/td[2]");
+    if (!status.empty()) result["status"] = status;
+    if (lowerText(result.value("status", "")) != "released") { result["eligible"] = false; result["eligibilityReason"] = "not-released"; }
+    for (auto* genre : page.nodes(std::string(info) + "//tr[td[1][normalize-space(.)='Genre']]/td[2]//a")) {
+        const auto value = Document::content(genre);
+        if (gameplayGenre(value)) result["genres"].push_back(value);
+    }
+    const std::string fields = std::string(info) + "//tr[td[1][normalize-space(.)='AI Disclosure' or normalize-space(.)='AI Generation' or normalize-space(.)='Generative AI' or normalize-space(.)='Tags']]/td[2]";
+    for (auto* link : page.nodes(fields + "//a/@href")) {
+        const auto href = lowerText(Document::content(link));
+        if (href.find("/no-ai") != std::string::npos || href.find("/tag-no-ai") != std::string::npos) result["aiDisclosure"] = "no-ai";
+        if (std::regex_search(href, std::regex(R"(/(?:tag-)?ai-(?:assisted|generated|graphics|sound|audio|text|dialog|code)(?:[/?#-]|$))"))) result["aiDisclosed"] = true;
+    }
+    const auto aiText = lowerText(page.text(std::string(info) + "//tr[td[1][normalize-space(.)='AI Disclosure' or normalize-space(.)='AI Generation' or normalize-space(.)='Generative AI']]/td[2]"));
+    if (aiText == "no" || aiText == "no ai" || aiText == "no generative ai") result["aiDisclosure"] = "no-ai";
+    if (result.value("aiDisclosure", "") != "no-ai" && (aiText == "yes" || aiText.find("ai assisted") != std::string::npos || aiText.find("ai generated") != std::string::npos || aiText.find("contains generative ai") != std::string::npos)) result["aiDisclosed"] = true;
+    if (result.value("aiDisclosed", false)) { result["aiDisclosure"] = "ai-assisted"; result["eligible"] = false; result["eligibilityReason"] = "ai-disclosed"; }
+    bool nonGame = false;
+    for (auto* node : page.nodes("//script[@type='application/ld+json']")) {
+        const auto data = Json::parse(Document::content(node), nullptr, false);
+        if (!data.is_object() || !data.contains("@type") || !data["@type"].is_string() || data["@type"] != "BreadcrumbList") continue;
+        for (const auto& crumb : data.value("itemListElement", Json::array())) {
+            const auto item = crumb.value("item", Json::object());
+            if (!item.is_object()) continue;
+            const auto path = item.value("@id", "");
+            for (const auto* category : {"/game-assets", "/tools", "/soundtracks", "/comics", "/books"}) if (path.rfind(std::string("https://itch.io") + category, 0) == 0) nonGame = true;
+        }
+    }
+    const auto classification = lowerText(page.text(std::string(info) + "//tr[td[1][normalize-space(.)='Classification']]/td[2]"));
+    if (classification.find("asset") != std::string::npos || classification == "tool" || classification == "software") nonGame = true;
+    const auto blurb = lowerText(listing.value("title", "") + " " + listing.value("description", "").substr(0, 350));
+    if (blurb.find("tattoo") != std::string::npos && (blurb.find("flash") != std::string::npos || blurb.find("sheet") != std::string::npos || blurb.find("design") != std::string::npos)) nonGame = true;
+    if (nonGame) { result["eligible"] = false; if (!result.value("aiDisclosed", false)) result["eligibilityReason"] = "non-game"; }
+    result["demo"] = std::regex_search(listing.value("title", ""), std::regex(R"(demo)", std::regex::icase));
+    return result;
 }
 
 Json steamDiscovery(int appID, bool full) {
@@ -218,21 +274,34 @@ Json steamDiscovery(int appID, bool full) {
 Json storeCollection(const std::string& store) {
     std::lock_guard<std::mutex> lock(dataMutex);
     Json result = store == "epic" ? epic : itch;
-    if (store == "epic") {
-        Json current = Json::array();
-        for (const auto& game : result["games"]) if (game.value("endsAt", 0LL) > std::time(nullptr)) current.push_back(game);
-        result["games"] = std::move(current);
+    const auto now = std::time(nullptr);
+    Json current = Json::array();
+    int pending = 0, excluded = 0;
+    for (auto game : result["games"]) {
+        if (store == "epic" && game.value("endsAt", 0LL) <= now) continue;
+        if (store == "itch") {
+            if (game.value("metadataCheckedAt", 0LL) == 0 || now - game.value("metadataCheckedAt", 0LL) >= 21600) { ++pending; continue; }
+            if (!publishedItchGame(game, now)) { ++excluded; continue; }
+            const auto sale = itchSalePrices.find(game.value("id", ""));
+            if (sale != itchSalePrices.end() && sale->second.value("checkedAt", 0LL) >= game["price"].value("checkedAt", 0LL)) game["price"] = sale->second;
+        }
+        if (game.contains("price") && game["price"].value("available", false)) game["price"]["stale"] = !currentPrice(game["price"], now);
+        current.push_back(std::move(game));
     }
-    for (auto& game : result["games"]) if (game.contains("price") && game["price"].value("available", false)) {
-        auto& price = game["price"];
-        const auto end = price.value("endsAt", 0LL);
-        price["stale"] = std::time(nullptr) - price.value("checkedAt", 0LL) >= 1800 || (end > 0 && end <= std::time(nullptr));
+    result["games"] = std::move(current);
+    result["pendingChecks"] = pending; result["excludedListings"] = excluded;
+    result["ready"] = result.value("updatedAt", 0LL) > 0;
+    result["stale"] = now - result.value("updatedAt", 0LL) >= 1800;
+    result["state"] = result.value("ready", false) ? (result.value("stale", true) || !result.value("message", "").empty() ? "saved" : pending > 0 ? "checking" : "ready") : result.value("message", "").rfind("Connecting", 0) == 0 ? "loading" : "unavailable";
+    if (store == "itch") {
+        result["salesCheckedAt"] = salesCheckedAt; result["priceMessage"] = salesMessage;
+        result["salesStatus"] = salesCheckedAt > 0 && now - salesCheckedAt >= 1800 ? "saved" : salesState;
     }
     return result;
 }
 
 void runDiscoveryRefresh(DashboardState& state) {
-    long long nextEpic = 0, nextItch = 0, nextItchDetail = 0, nextSteam = 0;
+    long long nextEpic = 0, nextItch = 0, nextSales = 0, nextItchDetail = 0, nextSteam = 0;
     std::map<std::string, long long> itchRetry;
     while (state.running) {
         const auto now = std::time(nullptr);
@@ -245,32 +314,48 @@ void runDiscoveryRefresh(DashboardState& state) {
                 auto fresh = fetchItch();
                 std::lock_guard<std::mutex> lock(dataMutex);
                 for (auto& game : fresh["games"]) for (const auto& old : itch["games"]) if (game["id"] == old["id"]) {
-                    for (const auto* key : {"genres", "studio", "releaseDate", "metadataCheckedAt"}) if (old.contains(key)) game[key] = old[key];
+                    for (const auto* key : {"genres", "studio", "releaseDate", "metadataCheckedAt", "eligible", "eligibilityReason", "aiDisclosed", "aiDisclosure", "rating", "demo"}) if (old.contains(key)) game[key] = old[key];
                 }
                 itch = std::move(fresh); nextItch = now + 1800;
             }
             catch (...) { std::lock_guard<std::mutex> lock(dataMutex); itch["message"] = "itch.io could not refresh. Available listings are retained."; nextItch = now + 300; }
         }
+        if (state.running && now >= nextSales) {
+            try {
+                const auto rows = parseItchListings(requestText("https://itch.io/games/newest/on-sale/released.xml"));
+                std::map<std::string, Json> fresh;
+                for (const auto& game : rows) if (game["price"].value("available", false) && game["price"].value("discount", 0) > 0) fresh[game.value("id", "")] = game["price"];
+                std::lock_guard<std::mutex> lock(dataMutex);
+                itchSalePrices = std::move(fresh); salesCheckedAt = std::time(nullptr); salesMessage.clear(); salesState = "ready"; nextSales = now + 1800;
+            } catch (const OnlineError& error) {
+                std::cerr << "itch.io sales: HTTP " << error.status << "; " << error.what() << std::endl;
+                std::lock_guard<std::mutex> lock(dataMutex); salesState = salesCheckedAt > 0 ? "saved" : "unavailable"; salesMessage = "Current sale information could not refresh. Available verified prices are retained."; nextSales = now + std::max(120, error.retryAfterSeconds);
+            } catch (const std::exception&) {
+                std::cerr << "itch.io sales: source parsing failed" << std::endl;
+                std::lock_guard<std::mutex> lock(dataMutex); salesState = salesCheckedAt > 0 ? "saved" : "unavailable"; salesMessage = "Current sale information could not refresh. Available verified prices are retained."; nextSales = now + 120;
+            }
+        }
         if (state.running && now >= nextItchDetail) {
             nextItchDetail = now + 10;
             std::string id;
+            Json candidateGame;
             {
                 std::lock_guard<std::mutex> lock(dataMutex);
                 std::set<std::string> current;
                 for (const auto& game : itch["games"]) {
                     const auto candidate = game.value("id", ""); current.insert(candidate);
-                    if (id.empty() && itchRetry[candidate] <= now && now - game.value("metadataCheckedAt", 0LL) >= 21600) id = candidate;
+                    if (id.empty() && itchRetry[candidate] <= now && now - game.value("metadataCheckedAt", 0LL) >= 21600) { id = candidate; candidateGame = game; }
                 }
                 for (auto it = itchRetry.begin(); it != itchRetry.end();) if (!current.count(it->first)) it = itchRetry.erase(it); else ++it;
             }
             if (!id.empty()) {
                 try {
-                    const auto detail = itchDetails(id);
+                    const auto detail = loadItchDetails(candidateGame);
                     if (now - detail.value("checkedAt", 0LL) >= 21600) throw std::runtime_error("Metadata is awaiting refresh.");
                     std::lock_guard<std::mutex> lock(dataMutex);
                     for (auto& game : itch["games"]) if (game.value("id", "") == id) {
-                        for (const auto* key : {"genres", "studio", "releaseDate"}) if (detail.contains(key)) game[key] = detail[key];
-                        game["metadataCheckedAt"] = now;
+                        for (const auto* key : {"genres", "studio", "releaseDate", "eligible", "eligibilityReason", "aiDisclosed", "aiDisclosure", "rating", "demo"}) if (detail.contains(key)) game[key] = detail[key];
+                        game["metadataCheckedAt"] = detail.value("checkedAt", now);
                     }
                     itchRetry.erase(id);
                 } catch (const OnlineError& error) {
@@ -301,26 +386,105 @@ void runDiscoveryRefresh(DashboardState& state) {
     }
 }
 
-Json budgetResponse(DashboardState& state, const Json& input) {
-    std::vector<Game> games;
-    { std::lock_guard<std::mutex> lock(state.mutex); for (const auto& game : state.games) games.push_back(gameSummary(game, false)); }
+static std::vector<Json> steamOffers(DashboardState& state) {
     std::vector<Json> offers;
-    for (const auto& game : games) { Json offer = game; offer["price"] = steamDiscovery(game.appID).at("price"); offer.erase("history"); offer.erase("reviews"); offers.push_back(std::move(offer)); }
+    { std::lock_guard<std::mutex> lock(state.mutex); for (const auto& game : state.games) offers.push_back(gameSummary(game, false)); }
+    for (auto& game : offers) { game["source"] = "steam"; game["price"] = steamDiscovery(game.at("appID").get<int>()).at("price"); game.erase("history"); game.erase("reviews"); }
+    return offers;
+}
+
+Json budgetOptions(DashboardState& state) {
+    Json result;
+    for (const auto* platform : {"steam", "itch", "epic"}) {
+        const auto collection = std::string(platform) == "steam" ? Json(steamOffers(state)) : storeCollection(platform)["games"];
+        std::set<std::string> genres, currencies;
+        for (const auto& game : collection) {
+            for (const auto& genre : game.value("genres", std::vector<std::string>{})) if (gameplayGenre(genre)) genres.insert(genre);
+            const auto price = game.value("price", Json::object());
+            if (price.value("available", false)) currencies.insert(price.value("currency", ""));
+        }
+        currencies.erase("");
+        if (currencies.empty()) currencies.insert(std::string(platform) == "itch" ? "USD" : "PHP");
+        result[platform] = {{"genres", genres}, {"currencies", currencies}, {"ratingKind", std::string(platform) == "itch" ? "stars" : std::string(platform) == "epic" ? "unavailable" : "positive"}};
+    }
+    return result;
+}
+
+Json catalogSummary(DashboardState& state) {
+    Json steam;
+    {
+        std::lock_guard<std::mutex> lock(state.mutex);
+        int pending = 0, excluded = 0;
+        for (const auto& rank : state.rankings) {
+            const auto found = state.records.find(rank.appID);
+            if (found == state.records.end() || found->second.title.empty() || found->second.type.empty()) ++pending;
+            else if (found->second.type != "game") ++excluded;
+        }
+        steam = {{"available", state.games.size()}, {"ranked", state.rankings.size()},
+            {"pending", pending}, {"excluded", excluded}, {"ready", !state.rankings.empty() || !state.games.empty()},
+            {"stale", state.rankings.empty() || !state.playerMessage.empty() || std::time(nullptr) - state.rankings.front().playersUpdatedAt > 600}};
+    }
+    Json result = {{"steam", steam}};
+    long long total = steam.at("available").get<long long>();
+    bool complete = steam.value("ranked", 0) > 0 && steam.value("pending", 0) == 0;
+    for (const auto* platform : {"epic", "itch"}) {
+        const auto collection = storeCollection(platform);
+        result[platform] = {{"available", collection["games"].size()}, {"ready", collection.value("ready", false)},
+            {"pending", collection.value("pendingChecks", 0)}, {"excluded", collection.value("excludedListings", 0)}, {"stale", collection.value("stale", true)}, {"state", collection.value("state", "loading")}};
+        total += static_cast<long long>(collection["games"].size());
+        complete = complete && collection.value("ready", false) && collection.value("pendingChecks", 0) == 0;
+    }
+    result["totalAvailable"] = total; result["complete"] = complete;
+    return result;
+}
+
+Json budgetResponse(DashboardState& state, const Json& input) {
+    const auto platform = input.value("platform", std::string("steam"));
+    if (platform != "steam" && platform != "itch" && platform != "epic") throw std::invalid_argument("Invalid platform.");
+    std::vector<Json> offers;
+    Json collection;
+    if (platform == "steam") offers = steamOffers(state);
+    else { collection = storeCollection(platform); for (const auto& game : collection["games"]) offers.push_back(game); }
     auto result = filterBudget(offers, input);
-    result["trackedGames"] = games.size();
+    result["trackedGames"] = offers.size();
+    result["message"] = collection.is_object() ? collection.value("message", "") : "";
+    result["sourceState"] = collection.is_object() ? collection.value("state", "loading") : "ready";
+    result["pendingChecks"] = collection.is_object() ? collection.value("pendingChecks", 0) : 0;
     return result;
 }
 
 Json itchDetails(const std::string& id) {
-    Json selected;
-    { std::lock_guard<std::mutex> lock(dataMutex); for (const auto& game : itch["games"]) if (game.value("id", "") == id) selected = game; }
-    if (selected.is_null() || !itchURL(id)) throw std::invalid_argument("This game is not in the current itch.io collection.");
+    if (!itchURL(id)) throw std::invalid_argument("Invalid project URL.");
+    const auto collection = storeCollection("itch");
+    for (const auto& game : collection["games"]) if (game.value("id", "") == id) {
+        auto detail = loadItchDetails(game);
+        const auto checked = detail.value("checkedAt", 0LL);
+        if (std::time(nullptr) - checked >= 21600) throw std::runtime_error("Creator information needs to refresh.");
+        bool current = false;
+        {
+            std::lock_guard<std::mutex> lock(dataMutex);
+            for (auto& entry : itch["games"]) if (entry.value("id", "") == id) {
+                current = true;
+                for (const auto* key : {"genres", "studio", "eligible", "eligibilityReason", "aiDisclosed", "aiDisclosure", "rating", "demo"}) if (detail.contains(key)) entry[key] = detail[key];
+                entry["metadataCheckedAt"] = checked;
+            }
+        }
+        if (!current || !detail.value("eligible", false) || detail.value("aiDisclosed", false)) throw std::invalid_argument("This project is no longer eligible for the collection.");
+        detail["price"] = game["price"]; detail["metadataCheckedAt"] = checked;
+        return detail;
+    }
+    throw std::invalid_argument("This game is not in the checked itch.io collection.");
+}
+
+static Json loadItchDetails(const Json& selected) {
+    const auto id = selected.at("id").get<std::string>();
     return cachedSteamContent("itch-detail:" + id, 21600, [=] {
-        Document page(requestText(id), true);
+        const auto html = requestText(id);
+        Document page(html, true);
         Json result = selected;
-        result["genres"] = Json::array();
-        for (auto* genre : page.nodes("//tr[td[1][normalize-space(.)='Genre']]/td[2]//a")) result["genres"].push_back(Document::content(genre));
+        result.update(parseItchPageMetadata(html, selected));
         result["screenshots"] = Json::array(); result["comments"] = Json::array(); result["posts"] = Json::array();
+        if (!result.value("eligible", false)) { result["checkedAt"] = std::time(nullptr); return result; }
         auto title = page.text("//title");
         const auto by = title.rfind(" by ");
         if (by != std::string::npos) result["studio"] = title.substr(by + 4);
@@ -362,7 +526,7 @@ Json itchDetails(const std::string& id) {
                     const auto url = feed.text("link", item);
                     if (url.rfind(base + "/devlog/", 0) != 0) continue;
                     result["posts"].push_back({{"id", feed.text("guid", item)}, {"title", feed.text("title", item)}, {"url", url},
-                        {"date", feed.text("pubDate", item)}, {"category", feed.text("category", item)}, {"text", feed.text("description", item)}});
+                        {"date", feed.text("pubDate", item)}, {"time", rssTime(feed.text("pubDate", item))}, {"category", feed.text("category", item)}, {"text", feed.text("description", item)}});
                     if (result["posts"].size() >= 10) break;
                 }
             } catch (...) { result["updatesMessage"] = "Developer posts could not refresh. Open the creator's page to check updates."; }

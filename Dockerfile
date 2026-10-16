@@ -13,8 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 WORKDIR /source
 COPY backend ./backend
-RUN cmake -S backend -B build -DCMAKE_BUILD_TYPE=Release \
-    && cmake --build build --parallel 2
+RUN cmake -S backend -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON \
+    && cmake --build build --parallel 2 \
+    && ctest --test-dir build --output-on-failure
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libcurl4 libxml2 \

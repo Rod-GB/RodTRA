@@ -7,12 +7,14 @@ import Price from './Price';
 import ScreenshotGallery from './ScreenshotGallery';
 import GameMetadata from './GameMetadata';
 import { number, timestamp, plainText, steamImage } from '../format';
+import { useSteamPages } from '../useSteamPages';
 
 // a game detail request uses C++ binary search.
 export default function GameDetails({ appID, onClose, section = 'overview', onSection }) {
   const dialog = useRef(null);
   const [game, setGame] = useState(null);
   const [error, setError] = useState('');
+  const pages = useSteamPages('patches', appID);
   useEffect(() => {
     if (!dialog.current.open) dialog.current.showModal();
     let stopped = false;
@@ -49,8 +51,8 @@ export default function GameDetails({ appID, onClose, section = 'overview', onSe
       <div className="detail-stats"><div><span>Players now</span><strong>{number(game.currentPlayers)}</strong></div><div><span>Peak today</span><strong>{number(game.peakToday)}</strong></div><div><span>Total reviews</span><strong>{game.reviewsUpdatedAt ? number(game.totalReviews) : '—'}</strong></div><div><span>Overall rating</span><Rating game={game}/></div></div>
       <p className="small muted">Steam player data: {timestamp(game.playersUpdatedAt)} · Released: {game.releaseDate || 'Not listed'}</p>
       <PlayerChart key={game.appID} game={game} large/>
-      <GameMetadata game={game}/>
-      </> : section === 'reviews' ? <ReviewsSection game={game}/> : <PatchNotes appID={game.appID}/>}
+      <GameMetadata game={game} pages={pages}/>
+      </> : section === 'reviews' ? <ReviewsSection game={game}/> : <PatchNotes pages={pages}/>}
     </>}
   </dialog>;
 }

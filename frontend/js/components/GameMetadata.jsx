@@ -1,18 +1,18 @@
 import React from 'react';
-import { useRemote } from '../useRemote';
 import { timestamp } from '../format';
+import { latestDeveloperPost } from '../gameInfo';
 
-export function MetadataPanel({ releaseDate, publisher, studio, update }) {
+export function MetadataPanel({ releaseDate, publisher, studio, update, loading = false, error = '', updateMessage = '' }) {
   return <section className="game-metadata" aria-label="Game metadata"><h3>Game information</h3><dl>
     <div><dt>Release date</dt><dd>{releaseDate || 'Not provided'}</dd></div>
-    <div><dt>Latest update</dt><dd>{update ? <a href={update.url} target="_blank" rel="noreferrer">{update.label}</a> : 'Not provided'}</dd></div>
+    <div><dt>Latest update</dt><dd>{update ? <><a href={update.url} target="_blank" rel="noreferrer">{update.title || update.label}</a>{update.title && <small>{update.label}</small>}<small>{update.kind || 'Developer post'}</small>{updateMessage && <small>{updateMessage}</small>}</> : loading ? 'Loading developer updates…' : error ? 'Updates could not load. Try again from this game’s updates section.' : 'Not provided by the source'}</dd></div>
     <div><dt>Publisher</dt><dd>{publisher || 'Not provided'}</dd></div>
     <div><dt>Studio / Developer</dt><dd>{studio || 'Not provided'}</dd></div>
   </dl></section>;
 }
 
-export default function GameMetadata({ game }) {
-  const { data } = useRemote(`/api/patches?id=${game.appID}`);
-  const patch = data?.posts?.find(post => post.patch && /^https:\/\//.test(post.url));
-  return <MetadataPanel releaseDate={game.releaseDate} publisher={game.publishers?.join(', ')} studio={game.developers?.join(', ')} update={patch ? { url: patch.url, label: timestamp(patch.time) } : null}/>;
+export default function GameMetadata({ game, pages }) {
+  const post = latestDeveloperPost(pages.items);
+  return <MetadataPanel releaseDate={game.releaseDate} publisher={game.publishers?.join(', ')} studio={game.developers?.join(', ')} loading={pages.loading && !pages.items.length} error={pages.error} updateMessage={pages.message}
+    update={post ? { url: post.url, title: post.title, label: timestamp(post.time), kind: post.kind || (post.patch ? 'Patch notes' : 'Developer announcement') } : null}/>;
 }

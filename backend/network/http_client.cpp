@@ -51,9 +51,9 @@ std::string requestText(const std::string& url, const Json& body, const std::str
     curl_easy_setopt(request.get(), CURLOPT_WRITEDATA, &response);
     curl_easy_setopt(request.get(), CURLOPT_HEADERFUNCTION, receiveHeader);
     curl_easy_setopt(request.get(), CURLOPT_HEADERDATA, &retryAfter);
-    curl_easy_setopt(request.get(), CURLOPT_USERAGENT, "Gdaw/1.0");
+    curl_easy_setopt(request.get(), CURLOPT_USERAGENT, "Gdaw/1.2");
     curl_easy_setopt(request.get(), CURLOPT_ACCEPT_ENCODING, "");
-    curl_slist* rawHeaders = curl_slist_append(nullptr, "Content-Type: application/json");
+    curl_slist* rawHeaders = curl_slist_append(nullptr, body.is_null() ? "Accept: */*" : "Content-Type: application/json");
     if (!rawHeaders) throw OnlineError("HTTPS headers could not be created.", true);
     if (!token.empty()) {
         auto* added = curl_slist_append(rawHeaders, ("Authorization: Bearer " + token).c_str());
@@ -72,9 +72,9 @@ std::string requestText(const std::string& url, const Json& body, const std::str
     curl_easy_getinfo(request.get(), CURLINFO_RESPONSE_CODE, &status);
     if (result != CURLE_OK) throw OnlineError("Online request timed out or could not connect.", true);
     if (status < 200 || status >= 300) {
-        if (status == 401 || status == 403) throw OnlineError("Online access was denied. Check the server credentials.", false);
-        if (status == 429) throw OnlineError("The data provider is temporarily limiting requests.", true, retryAfter);
-        throw OnlineError("The data provider could not complete the request.", status >= 500, retryAfter);
+        if (status == 401 || status == 403) throw OnlineError("Online access was denied.", false, retryAfter, static_cast<int>(status));
+        if (status == 429) throw OnlineError("The data provider is temporarily limiting requests.", true, retryAfter, static_cast<int>(status));
+        throw OnlineError("The data provider could not complete the request.", status >= 500, retryAfter, static_cast<int>(status));
     }
     return response;
 }

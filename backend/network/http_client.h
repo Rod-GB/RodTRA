@@ -7,8 +7,9 @@ class OnlineError : public std::runtime_error {
 public:
     bool retryable;
     int retryAfterSeconds;
-    OnlineError(const std::string& message, bool temporary, int retryAfter = 30)
-        : std::runtime_error(message), retryable(temporary), retryAfterSeconds(retryAfter) {}
+    int status;
+    OnlineError(const std::string& message, bool temporary, int retryAfter = 30, int httpStatus = 0)
+        : std::runtime_error(message), retryable(temporary), retryAfterSeconds(retryAfter), status(httpStatus) {}
 };
 
 Json requestJson(const std::string& url, const Json& body = nullptr, const std::string& token = "");

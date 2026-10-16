@@ -1,11 +1,9 @@
 import React from 'react';
 import { timestamp } from '../format';
-import { useSteamPages } from '../useSteamPages';
 import PatchArticle from './PatchArticle';
 export { patchText } from '../patchText';
 
-export default function PatchNotes({ appID }) {
-  const pages = useSteamPages('patches', appID);
+export default function PatchNotes({ pages }) {
   return <section className="patches-section" aria-label="Steam patch notes and updates">
     <div className="reviews-heading"><div><h3>Patches & updates</h3><p className="small muted">Complete developer posts, readable here on Gdaw.</p></div><button className="secondary-button" disabled={pages.loading} onClick={pages.refresh}>Refresh</button></div>
     {pages.updatedAt > 0 && <p className="small muted">Last fetched: {timestamp(pages.updatedAt)}</p>}
