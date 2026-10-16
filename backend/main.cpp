@@ -42,11 +42,13 @@ int main() {
 #endif
     std::thread updater(runAutomaticRefresh, std::ref(state));
     std::thread discovery(runDiscoveryRefresh, std::ref(state));
+    std::thread creatorChecks(runItchChecks, std::ref(state));
     int result = 0;
     try { runWebsiteServer(state); }
     catch (const std::exception& error) { std::cerr << error.what() << '\n'; result = 1; }
     state.running = false;
     updater.join();
     discovery.join();
+    creatorChecks.join();
     return result;
 }

@@ -16,6 +16,19 @@ inline bool gameplayGenre(const std::string& genre) {
     return !genre.empty() && !other.count(lowerText(genre));
 }
 
+// Offer choices come from the store's complete genre list, not a fixed whitelist.
+inline bool catalogGenre(const std::string& genre) {
+    return !genre.empty() && genre.size() <= 80 &&
+        std::none_of(genre.begin(), genre.end(), [](unsigned char c) { return c < 32; });
+}
+
+struct ItchCheckRetry { long long projectAt, collectionAt; };
+inline ItchCheckRetry itchCheckRetry(long long now, int status, int retryAfter) {
+    const auto projectAt = now + std::max(120, retryAfter);
+    // Rate limits affect the provider; a broken creator page affects only itself.
+    return {projectAt, status == 429 ? projectAt : now};
+}
+
 inline bool publishedItchGame(const Json& game, long long now) {
     return game.value("metadataCheckedAt", 0LL) > 0 && now - game.value("metadataCheckedAt", 0LL) < 21600 &&
         game.value("eligible", false) && !game.value("aiDisclosed", false);

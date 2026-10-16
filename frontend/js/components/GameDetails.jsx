@@ -44,7 +44,7 @@ export default function GameDetails({ appID, onClose, section = 'overview', onSe
     {!game ? <h2 id="detail-title">{error ? 'Game unavailable' : 'Loading game…'}</h2> : <>
       <header className="detail-header">{steamImage(game.image) && <img src={steamImage(game.image)} alt=""/>}<div><span className="eyebrow">STEAM GAME</span><h2 id="detail-title">{game.title}</h2><p className="muted">{game.genres.join(' · ')}</p>
         <a className="store-link" href={`https://store.steampowered.com/app/${game.appID}/`} target="_blank" rel="noreferrer">Steam store</a></div></header>
-      <nav className="detail-nav" aria-label="Game sections">{[['overview', 'Overview'], ['reviews', 'Reviews'], ['updates', 'Patch notes']].map(([tab, label]) => <button key={tab} aria-pressed={section === tab} onClick={() => onSection(tab)}>{label}</button>)}</nav>
+      <nav className="detail-nav" aria-label="Game sections">{[['overview', 'Overview'], ['reviews', 'Reviews'], ['updates', 'Updates']].map(([tab, label]) => <button key={tab} aria-pressed={section === tab} onClick={() => onSection(tab)}>{label}</button>)}</nav>
       {section === 'overview' ? <><p className="game-description">{plainText(game.description)}</p>
       <Price price={game.price} detailed/>
       <ScreenshotGallery screenshots={game.screenshots} title={game.title}/>

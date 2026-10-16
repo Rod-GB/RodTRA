@@ -11,9 +11,9 @@ const updateDate = value => new Intl.DateTimeFormat(undefined, {
 export default function UpdatesView() {
   return <section className="site-updates-view" aria-labelledby="updates-title">
     <div className="page-heading"><div>
-      <p className="eyebrow">Gdaw changelog</p>
+      <p className="eyebrow">Gdaw</p>
       <h1 id="updates-title">Website <span>updates.</span></h1>
-      <p>New features, improvements and fixes for Gdaw.</p><span className="version-badge">Version {version}</span>
+      <p>What’s new on Gdaw.</p><span className="version-badge">Version {version}</span>
     </div></div>
     <div className="site-updates-list">{updates.map((update, index) => <article className="site-update" key={update.date} aria-labelledby={`update-${update.date}`}>
       <div className="site-update-meta"><time dateTime={update.date}>{updateDate(update.date)}</time>{index === 0 && <span>Latest update</span>}</div>

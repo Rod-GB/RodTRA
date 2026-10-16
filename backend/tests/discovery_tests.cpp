@@ -34,6 +34,12 @@ int main() {
         bool refused = false;
         try { parseItchPageMetadata("<html>Upstream challenge</html>", listing); } catch (...) { refused = true; }
         require(refused, "An inaccessible creator page must not count as a completed check");
+        const auto rated = parseItchPageMetadata(page("<tr><td>Genre</td><td><a>Visual Novel</a><a>Puzzle</a></td></tr>") +
+            "<script type='application/ld+json'>{\"aggregateRating\":{\"ratingValue\":\"4.5\",\"ratingCount\":\"12\"}}</script>", listing);
+        require(rated["genres"].size() == 2 && rated["rating"]["stars"] == 4.5, "One-page checks must include every supplied genre and rating");
+        const auto denied = itchCheckRetry(1000, 403, 60), missing = itchCheckRetry(1000, 404, 60), limited = itchCheckRetry(1000, 429, 300);
+        require(denied.projectAt > 1000 && denied.collectionAt == 1000 && missing.collectionAt == 1000, "An individual creator error must not pause the collection");
+        require(limited.collectionAt == 1300 && limited.projectAt == 1300, "Provider rate limits must delay the collection");
 
         const auto rows = parseItchListings("<rss><channel><item><link>https://creator.itch.io/game</link><plainTitle>Game</plainTitle><price>$2.00</price><currency>USD</currency></item><item><link>https://creator.itch.io/game</link><plainTitle>Duplicate</plainTitle></item><item><link>https://evil.example/game</link><plainTitle>Invalid</plainTitle></item><item><link>https://creator.itch.io/other</link><plainTitle>Other</plainTitle><price>$2.00</price><currency>USD</currency><discountpercent>broken</discountpercent></item></channel></rss>");
         require(rows.size() == 2 && rows[0].at("title") == "Game", "RSS must preserve order and remove invalid/duplicate links");
@@ -42,6 +48,12 @@ int main() {
         auto game = Json{{"appID", 1}, {"source", "steam"}, {"title", "Game"}, {"genres", {"Action"}}, {"positiveReviews", 90}, {"totalReviews", 100}, {"price", price("PHP", 25000)}};
         auto input = Json{{"budget", "500"}, {"rating", 80}, {"genres", {"Action"}}};
         require(filterBudget({game}, input)["games"].size() == 1, "Steam budget and rating must match");
+        auto labelled = game; labelled["genres"] = {"Free To Play", "Early Access", "Visual Novel"};
+        auto genreInput = input; genreInput["genres"] = {"Early Access"};
+        require(filterBudget({labelled}, genreInput)["games"].size() == 1, "Every supplied store label must work as a genre choice");
+        genreInput["genres"] = {"Invented genre"}; refused = false;
+        try { filterBudget({labelled}, genreInput); } catch (...) { refused = true; }
+        require(refused, "Unknown genre choices must be rejected");
         input["budget"] = "200"; require(filterBudget({game}, input)["games"].empty(), "Over-budget games must be excluded");
         auto itchGame = game; itchGame["source"] = "itch"; itchGame["price"] = price("USD", 250); itchGame["eligible"] = true;
         itchGame["aiDisclosed"] = false; itchGame["metadataCheckedAt"] = std::time(nullptr); itchGame["rating"] = {{"stars", 4.5}, {"count", 10}};
@@ -65,6 +77,8 @@ int main() {
         require(posts["posts"][0]["kind"] == "Developer update", "Untagged update posts must be recognized");
         require(posts["posts"][0]["url"] == "https://steamcommunity.com/games/1172470/announcements/detail/123", "Links must target the exact announcement");
         DashboardState state; Game known; known.appID = 1; known.type = "game"; known.title = "Known"; state.games.push_back(known);
+        state.games[0].genres = {"Action", "Free To Play", "Early Access", "Visual Novel"};
+        require(budgetOptions(state)["steam"]["genres"].size() == 4, "Budget options must retain all supplied labels without a fixed list");
         state.rankings = {known, Game{}, Game{}}; state.rankings[1].appID = 2; state.rankings[2].appID = 3;
         state.records[1] = known; Game demo = known; demo.appID = 2; demo.type = "demo"; state.records[2] = demo;
         auto totals = catalogSummary(state);

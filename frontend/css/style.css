@@ -171,5 +171,35 @@ a:hover,.text-link:hover,.quiet-button:hover,.card-content h3 button:hover,.libr
 .phone-peak{display:none}.peak-label{white-space:normal;line-height:1.5}.price-currency-note{margin:14px 0 0}
 @media(max-width:720px){.phone-peak{display:block;margin-top:4px;color:var(--muted);font-size:10px;line-height:1.5}.leaderboard .leader-count{min-width:0}.peak-label{font-size:10px;overflow-wrap:anywhere}}
 
-.collection-summary{padding:18px 20px;margin:0 0 22px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.collection-summary>strong{font-size:14px}.collection-summary p{font-size:12px;color:var(--muted);line-height:1.8;margin:7px 0}.collection-summary small{display:block;font-size:11px;color:var(--muted)}.catalog-breakdown{display:flex;flex-wrap:wrap;gap:8px 24px;margin:-10px 0 32px;color:var(--muted);font-size:12px}.catalog-breakdown small{flex-basis:100%;font-size:11px;line-height:1.7}.budget-platform{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px;margin-bottom:24px}.budget-platform>span{font-size:13px;color:var(--muted)}.budget-platform>p{flex-basis:100%;margin:0}.budget-main-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.budget-main-fields>label:last-child{grid-column:auto}.game-metadata dd{overflow-wrap:anywhere}.game-metadata dd small{display:block;font-size:11px;color:var(--muted);margin-top:6px}.budget-form select:disabled{opacity:.65}.card-image-button:empty::after,.library-art:empty::after{content:'Artwork unavailable';font-size:12px;color:var(--muted)}.card-image-button,.library-art{position:relative}.store-card h2{overflow-wrap:anywhere}
+.collection-summary{padding:18px 20px;margin:0 0 22px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}.collection-summary>strong{font-size:14px}.collection-summary p{font-size:12px;color:var(--muted);line-height:1.8;margin:7px 0}.collection-summary small{display:block;font-size:11px;color:var(--muted)}.catalog-breakdown{display:flex;flex-wrap:wrap;gap:8px 24px;margin:16px 0 28px;color:var(--muted);font-size:12px}.catalog-breakdown small{flex-basis:100%;font-size:11px;line-height:1.7}.budget-platform{display:flex;align-items:center;flex-wrap:wrap;gap:12px 18px;margin-bottom:24px}.budget-platform>span{font-size:13px;color:var(--muted)}.budget-platform>p{flex-basis:100%;margin:0}.budget-main-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.budget-main-fields>label:last-child{grid-column:auto}.game-metadata dd{overflow-wrap:anywhere}.game-metadata dd small{display:block;font-size:11px;color:var(--muted);margin-top:6px}.budget-form select:disabled{opacity:.65}.card-image-button:empty::after,.library-art:empty::after{content:'Artwork unavailable';font-size:12px;color:var(--muted)}.card-image-button,.library-art{position:relative}.store-card h2{overflow-wrap:anywhere}
 @media(max-width:720px){.catalog-breakdown{display:grid;gap:6px;margin-top:0}.budget-main-fields{grid-template-columns:1fr}.collection-summary{padding:15px}.budget-platform .platform-select{flex:1}}
+
+/* Compact store summaries and forms. */
+.catalog-breakdown{align-items:center;gap:10px;margin:16px 0 28px}
+.catalog-breakdown>a{display:inline-flex;align-items:center;gap:12px;padding:7px 12px;border:1px solid var(--line);border-radius:8px;text-decoration:none;color:var(--muted)}
+.catalog-breakdown>a strong{color:var(--text);font-variant-numeric:tabular-nums}
+.catalog-progress{font-size:12px;color:var(--muted)}
+.catalog-breakdown details{flex-basis:100%;margin-top:2px}
+.catalog-breakdown details p{margin-top:7px;max-width:560px;line-height:1.7}
+.catalog-breakdown summary,.collection-summary summary{cursor:pointer;color:var(--muted);font-size:12px;width:fit-content}
+.catalog-breakdown summary:hover,.collection-summary summary:hover{color:#ff8b9e}
+.collection-summary{display:flex;align-items:baseline;flex-wrap:wrap;gap:8px 20px;padding:0;margin:0 0 18px;border:0;border-radius:0;background:none;font-size:13px;color:var(--muted)}
+.collection-summary details{flex:1;min-width:140px}.collection-summary details[open]{flex-basis:100%}
+.collection-summary p{max-width:680px;margin:8px 0;line-height:1.7}
+.overview-stats>div{min-height:104px}.overview-stats div>div>span{line-height:1.5}
+.budget-form{padding:24px}.budget-main-fields{grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px}
+.budget-platform{margin-bottom:20px;gap:8px 14px}.budget-platform .platform-select{max-width:230px}
+.genre-choices{max-height:250px;overflow-y:auto;padding:2px 4px 6px 2px;scrollbar-width:thin}
+.genre-choices label{cursor:pointer;min-height:40px}.genre-choices label:has(input:disabled){cursor:default}
+.genre-select select:disabled{opacity:.6;cursor:default}
+.page-heading .eyebrow{margin:0}.page-heading h1{margin-top:6px}
+@media(max-width:720px){
+ .catalog-breakdown{display:flex;gap:8px;margin:14px 0 24px}.catalog-breakdown>a{padding:7px 10px;gap:9px}
+ .catalog-progress{flex-basis:100%;margin-top:2px}.catalog-breakdown details{margin-top:2px}
+ .budget-form{padding:18px}.budget-main-fields{grid-template-columns:1fr}.budget-platform .platform-select{max-width:none}
+ .overview-stats>div{min-height:94px}.collection-summary{gap:7px}.collection-summary details{flex-basis:100%}
+ .steam-updates>span:last-child{max-width:none;white-space:nowrap}.genre-choices{max-height:270px}
+ .library-view .page-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+ .library-view .library-total{padding-top:28px;text-align:right;max-width:84px;font-size:27px}
+ .library-view .library-total>span{font-size:11px;line-height:1.5}
+}

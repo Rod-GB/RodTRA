@@ -11,7 +11,7 @@ import AllGamesView from './components/AllGamesView';
 import UpdatesView from './components/UpdatesView';
 import BudgetFinder from './components/BudgetFinder';
 import DiscountsView from './components/DiscountsView';
-import { timestamp } from './format';
+import { time } from './format';
 import { readRoute, routeURL } from './navigation';
 
 function Dashboard() {
@@ -69,9 +69,9 @@ function Dashboard() {
     <Sidebar view={route.view} open={menuOpen} onNavigate={() => setMenuOpen(false)}/>
     <main id="main-content" className="workspace" ref={content} tabIndex={-1} inert={menuOpen}>
       {steamView && <>
-        <div className="steam-updates"><span><span className={`status-dot ${cached ? 'cached' : ''}`}/>Game data</span><span>{sourceTime ? `Game data as of ${timestamp(sourceTime)}` : 'Connecting to game data…'}</span></div>
+        <div className="steam-updates"><span><span className={`status-dot ${cached ? 'cached' : ''}`}/>Game data</span><span>{sourceTime ? `Updated ${time(sourceTime)}` : 'Loading…'}</span></div>
         {(error || data.message) && <p className="notice" role="status">{error || data.message}</p>}
-        {stale && !error && !data.message && <p className="notice" role="status">Showing saved player counts while Steam reconnects.</p>}
+        {stale && !error && !data.message && <p className="notice" role="status">Player counts are waiting for an update.</p>}
       </>}
       {route.view === 'dashboard' ? <GamesView data={data} loading={loading} onOpen={openGame}/> :
         route.view === 'budget' ? <BudgetFinder onOpen={openGame}/> :
@@ -80,7 +80,7 @@ function Dashboard() {
         route.view === 'updates' ? <UpdatesView/> :
         route.view === 'genres' ? <GenresView data={data} route={route} loading={loading} onOpen={openGame} onNavigate={navigate}/> :
         <MostPlayed games={data.games} loading={loading} onOpen={openGame} cached={cached}/>}
-      <footer className="page-footer"><span className="footer-brand">Gdaw<span>.</span></span><p>Discover your next game.</p><span>Powered by GDAW</span></footer>
+      <footer className="page-footer"><span className="footer-brand">Gdaw<span>.</span></span><p>Game data</p><span>Powered by GDAW</span></footer>
     </main>
     {route.game && <GameDetails key={route.game} appID={Number(route.game)} section={route.tab} onSection={tab => navigate({ tab }, true)} onClose={() => navigate({ game: '', tab: 'overview' })}/>}
   </>;

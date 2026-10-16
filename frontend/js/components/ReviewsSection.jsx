@@ -11,7 +11,7 @@ export default function ReviewsSection({ game }) {
   return <section className="reviews-section" aria-label="Player reviews">
     <div className="reviews-heading"><div><h3>Player reviews</h3><p className="small muted">English reviews · Overall rating: all languages.</p></div><Rating game={game}/></div>
     <div className="content-controls"><label>Order <select value={sort} onChange={event => setSort(event.target.value)}><option value="recent">Newest</option><option value="helpful">Most helpful</option></select></label><button className="quiet-button" disabled={pages.loading} onClick={pages.refresh}>Refresh reviews</button><span className="small muted">{number(game.totalReviews)} total</span></div>
-    <p className="small muted">{pages.updatedAt ? `Fetched: ${timestamp(pages.updatedAt)}` : game.reviewsUpdatedAt ? `Saved rating: ${timestamp(game.reviewsUpdatedAt)}` : 'Getting Steam reviews…'}</p>
+    <p className="small muted">{pages.updatedAt ? `Updated ${timestamp(pages.updatedAt)}` : game.reviewsUpdatedAt ? `Rating updated ${timestamp(game.reviewsUpdatedAt)}` : 'Getting Steam reviews…'}</p>
     {pages.error && <p className="notice" role="alert">{pages.error} <button className="quiet-button" disabled={pages.loading} onClick={pages.items.length ? pages.loadMore : pages.refresh}>Retry</button></p>}
     {pages.message && <p className="notice" role="status">{pages.message}</p>}
     {reviews.length ? <div className="review-list">{reviews.map(review => <ReviewCard key={review.id} review={review} appID={game.appID}/>)}</div> : <p className="empty-reviews">{pages.loading ? 'Loading reviews…' : pages.error ? 'Reviews could not be loaded.' : 'No English reviews available.'}</p>}

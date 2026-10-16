@@ -1,32 +1,35 @@
 # Gdaw website updates
 
-## 2026-10-15 | Version 1.2.0 — Clearer discovery across three stores
+## 2026-10-17 | Version 1.2.1 — Easier browsing
 
 ### Improvements
 
-- Budget Finder now supports Steam, itch.io and current Epic giveaways, with native currencies and store-specific rating scales.
-- See Philippine prices, discounts and total reviews, with screenshots and simple game information.
-- Discover currently claimable Epic giveaways and up to 50 released itch.io listings.
-- Explore available itch.io ratings, public comments and creator devlogs.
-- Budget Finder inputs and results stay temporary. Changing choices cancels outdated searches.
-- The dashboard total combines eligible Steam, itch.io and Epic listings, with a per-store breakdown.
-- Recent itch.io releases are checked for explicit AI disclosures and identified non-game content before appearing.
-- itch.io collection notes explain the up-to-50 cap, newest-first order, pending checks and source freshness.
-- Sale prices refresh separately without adding older sale projects to the recent-release collection.
-- Choose Steam, Epic Games or itch.io from the third control in All Games, or switch platforms in Genres.
-- Browse current Steam and itch.io sales in the separate Discounts page, with original prices, sale prices and percentages where supplied.
-- Epic giveaways show their original price and claim deadline when provided.
+- Shorter labels and cleaner pages on desktop and mobile.
+- All listed genres are available in Budget Finder. Pick up to three.
+- Epic free games appear directly in Budget Finder.
+- Clearer game counts and a simple breakdown by store.
 
 ### Fixes
 
-- Sidebar backgrounds fill more slowly from left to right and drain from right to left.
-- Touch holds retain the sidebar fill until release, and clickable text receives red feedback.
-- Shared labels now say Game data and Powered by GDAW.
-- Most Played bars compare each game's current players with its own peak today, with a visible percentage or At peak label.
-- Budget Finder separates gameplay genres from software, price and release-status labels, with a three-selection counter.
-- Metadata and developer posts share one update state, recognize untagged update titles and link to exact source posts.
-- Loading, unavailable feeds and genuinely empty results have distinct messages.
-- Gallery swipes no longer trigger an unintended image enlargement.
+- A failed itch.io game page no longer holds up other game checks.
+- itch.io games appear without waiting for comments and developer posts to load.
+- Epic games can be sorted by when the free offer ends.
+- Removed misleading genre loading messages and unused filters.
+
+## 2026-10-15 | Version 1.2.0 — More stores, prices and game details
+
+### New features
+
+- Browse new itch.io releases and current Epic free games alongside Steam.
+- Find games by price, rating and up to three genres. Your choices aren’t saved.
+- See original prices, discounts, screenshots, reviews and developer updates where available.
+- Browse sales in Discounts.
+
+### Fixes
+
+- Slower sidebar hover effects and better touch feedback.
+- Most Played bars show each game’s current players compared with its peak today.
+- Clearer game information and links to developer updates.
 
 ## 2026-10-12 | Simpler genres and clearer website updates
 

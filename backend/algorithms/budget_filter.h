@@ -64,7 +64,10 @@ inline Json filterBudget(const std::vector<Json>& source, const Json& input) {
     const auto genres = input.value("genres", std::vector<std::string>{});
     if (genres.size() > 3) throw std::invalid_argument("Choose up to three genres.");
     if (platform == "epic" && !genres.empty()) throw std::invalid_argument("Genre information is unavailable for these giveaways.");
-    for (const auto& genre : genres) if (genre.size() > 80 || !gameplayGenre(genre)) throw std::invalid_argument("Invalid genre.");
+    for (const auto& genre : genres) if (!catalogGenre(genre) || std::none_of(source.begin(), source.end(), [&](const auto& game) {
+        const auto supplied = game.value("genres", std::vector<std::string>{});
+        return game.value("source", "steam") == platform && std::find(supplied.begin(), supplied.end(), genre) != supplied.end();
+    })) throw std::invalid_argument("Choose an available genre.");
     const auto order = input.value("sort", std::string("rating"));
     if (order != "rating" && order != "price" && order != "discount") throw std::invalid_argument("Invalid result order.");
     std::vector<Json> paid, free;
@@ -72,7 +75,6 @@ inline Json filterBudget(const std::vector<Json>& source, const Json& input) {
     for (auto game : source) {
         if (game.value("source", "steam") != platform) continue;
         const auto tags = game.value("genres", std::vector<std::string>{});
-        if (platform == "steam" && !tags.empty() && std::none_of(tags.begin(), tags.end(), gameplayGenre)) continue;
         if (platform == "itch" && !publishedItchGame(game, std::time(nullptr))) continue;
         if (platform == "epic" && game.value("endsAt", 0LL) <= std::time(nullptr)) continue;
         const auto price = game.value("price", Json::object());

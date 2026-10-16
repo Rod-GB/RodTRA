@@ -12,22 +12,21 @@ export default function GamesView({ data, loading, onOpen }) {
   const totals = summary.data;
   const players = data.games.reduce((total, game) => total + game.currentPlayers, 0);
   return <section className="dashboard-view" aria-labelledby="dashboard-title">
-    <div className="page-heading"><div><p className="eyebrow">Your discovery starts here</p><h1 id="dashboard-title">Find your next <span>favorite.</span></h1><p>A fresh selection from Steam’s top 100. Pick a game and explore.</p></div><a className="secondary-button" href="#/all-games">Explore all games <Icon name="arrow"/></a></div>
+    <div className="page-heading"><div><p className="eyebrow">Gdaw</p><h1 id="dashboard-title">What are you <span>playing next?</span></h1><p>Popular on Steam. Free on Epic. New on itch.io.</p></div><a className="secondary-button" href="#/all-games">Browse games <Icon name="arrow"/></a></div>
     <div className="overview-stats">
-      <div><span className="stat-icon"><Icon name="dashboard"/></span><div><span>Games available</span><strong>{!totals ? '—' : `${number(totals.totalAvailable)}${totals.complete ? '' : '+'}`}</strong></div><span className="stat-context">Across three stores</span></div>
-      <div><span className="stat-icon"><Icon name="players"/></span><div><span>Players across tracked Steam games</span><strong>{loading && !data.games.length ? '—' : number(players)}</strong></div></div>
-      <div><span className="stat-icon"><Icon name="genres"/></span><div><span>Genres to explore</span><strong>{loading && !data.games.length ? '—' : number(data.genres.length)}</strong></div><a href="#/genres" aria-label="Explore genres"><Icon name="arrow"/></a></div>
+      <div><span className="stat-icon"><Icon name="dashboard"/></span><div><span>Games listed</span><strong>{totals ? number(totals.totalAvailable) : '—'}</strong></div></div>
+      <div><span className="stat-icon"><Icon name="players"/></span><div><span>Playing now on Steam</span><strong>{loading && !data.games.length ? '—' : number(players)}</strong></div></div>
+      <div><span className="stat-icon"><Icon name="genres"/></span><div><span>Steam genres</span><strong>{loading && !data.games.length ? '—' : number(data.genres.length)}</strong></div><a href="#/genres" aria-label="Browse genres"><Icon name="arrow"/></a></div>
     </div>
     <div className="catalog-breakdown" aria-live="polite">{totals ? <>
-      <span>Steam: {totals.steam.ready ? number(totals.steam.available) : 'Loading'} games / {totals.steam.ranked ? `${number(totals.steam.ranked)} ranked entries` : 'rankings loading'}</span>
-      <span>itch.io: {totals.itch.ready ? number(totals.itch.available) : totals.itch.state === 'unavailable' ? 'Unavailable' : 'Loading'}{totals.itch.pending > 0 ? ` · ${totals.itch.pending} awaiting checks` : ''}</span>
-      <span>Epic: {totals.epic.ready ? number(totals.epic.available) : totals.epic.state === 'unavailable' ? 'Unavailable' : 'Loading'} active giveaways</span>
-      <small>{!totals.complete ? '+ Collections are still loading or being checked. ' : ''}Counts are per store; the same game can appear on more than one store.{[totals.steam, totals.itch, totals.epic].some(source => source.stale) ? ' Some sources are awaiting refresh.' : ''}</small>
-    </> : <p>{summary.error || 'Counting the available collections…'}</p>}</div>
-    <div className="section-heading"><div><h2>On your radar</h2><p>Something familiar. Something unexpected.</p></div><button className="secondary-button" onClick={shuffle} disabled={!data.games.length}><Icon name="shuffle"/> Shuffle games</button></div>
-    <a className="budget-entry" href="#/budget"><span><strong>Find games suitable for your budget</strong><small>Choose your budget and rating. Get matches with clear reasons.</small></span><Icon name="arrow"/></a>
+      {[['steam','Steam'],['epic','Epic'],['itch','itch.io']].map(([key,label]) => <a key={key} href={`#/all-games?platform=${key}`}>{label} <strong>{totals[key].ready ? number(totals[key].available) : totals[key].state === 'unavailable' ? 'Unavailable' : 'Loading…'}</strong></a>)}
+      {totals.itch.pending > 0 && <span className="catalog-progress">More itch.io games are loading.</span>}
+      <details><summary>About these numbers</summary><p>Games are counted once per store. Player counts cover the Steam games listed here.{[totals.steam, totals.itch, totals.epic].some(source => source.stale) ? ' Some numbers are waiting for an update.' : ''}</p></details>
+    </> : <p>{summary.error ? 'Game counts could not load.' : 'Loading game counts…'}</p>}</div>
+    <a className="budget-entry" href="#/budget"><span><strong>Find games within your budget</strong><small>Set your price and pick up to 3 genres.</small></span><Icon name="arrow"/></a>
+    <div className="section-heading"><div><h2>From Steam’s top 100</h2><p>Pick a game to see more.</p></div><button className="secondary-button" onClick={shuffle} disabled={!data.games.length}><Icon name="shuffle"/> Shuffle games</button></div>
     {loading && !picks.length ? <LoadingCards/> : <div className="game-grid">{picks.map(game => <GameCard key={game.appID} game={game} onOpen={onOpen}/>)}</div>}
-    {!loading && !picks.length && <div className="empty-state"><Icon name="dashboard"/><h3>{data.refreshing ? 'Gathering Steam games' : 'No games available yet'}</h3><p>The collection will appear here when Steam data arrives.</p></div>}
-    <a className="discovery-banner" href="#/most-played"><span className="banner-icon"><Icon name="trophy"/></span><div><h3>See where everyone is playing.</h3><p>Explore the ten most played games in our Steam collection.</p></div><span className="banner-link">View leaderboard <Icon name="arrow"/></span></a>
+    {!loading && !picks.length && <div className="empty-state"><Icon name="dashboard"/><h3>No Steam games yet</h3><p>{data.refreshing ? 'Games are loading. Check back shortly.' : 'Steam games could not load. Please try again.'}</p></div>}
+    <a className="discovery-banner" href="#/most-played"><span className="banner-icon"><Icon name="trophy"/></span><div><h3>Most played on Steam</h3><p>See the top 10 games by players online.</p></div><span className="banner-link">View top 10 <Icon name="arrow"/></span></a>
   </section>;
 }

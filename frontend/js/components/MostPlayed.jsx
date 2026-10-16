@@ -7,13 +7,13 @@ import { number, steamImage } from '../format';
 export default function MostPlayed({ games, loading, onOpen, cached }) {
   const leaders = games.slice(0, 10);
   return <section className="most-played-view" aria-labelledby="leaders-title">
-    <div className="page-heading"><div><p className="eyebrow">The Steam leaderboard</p><h1 id="leaders-title">Most <span>played.</span></h1><p>The top ten in our collection, ranked by players right now.</p></div><span className="live-pill"><span className={`status-dot ${cached ? 'cached' : ''}`}/>{cached ? 'Saved player counts' : 'Auto-updating counts'}</span></div>
+    <div className="page-heading"><div><p className="eyebrow">Steam</p><h1 id="leaders-title">Most <span>played.</span></h1><p>The top 10 games by players online.</p></div><span className="live-pill"><span className={`status-dot ${cached ? 'cached' : ''}`}/>{cached ? 'Saved player counts' : 'Live players'}</span></div>
     {!!leaders.length && <div className="podium">{leaders.slice(0, 3).map((game, index) => <button key={game.appID} className={`podium-card podium-${index + 1}`} onClick={() => onOpen(game.appID)}>
       <div className="podium-art">{steamImage(game.image) && <img src={steamImage(game.image)} alt=""/>}<span className="podium-rank">{index === 0 && <Icon name="trophy"/>}#{index + 1}</span></div>
       <div className="podium-content"><h2>{game.title}</h2><p><strong>{number(game.currentPlayers)}</strong><span>players now</span></p></div>
     </button>)}</div>}
     <div className="section-heading"><div><h2>Top 10</h2><p>Player counts refresh automatically.</p></div><span className="muted small">Steam players only</span></div>
-    {!!leaders.length && <p className="small muted peak-explanation">Each red bar compares players now with that game’s peak today. A full bar means the current count has reached its peak.</p>}
+    {!!leaders.length && <p className="small muted peak-explanation">Red bars show how close each game is to its peak today.</p>}
     {!!leaders.length && <div className="leaderboard-scroll"><table className="leaderboard"><caption className="sr-only">Top ten games by current Steam player count</caption><thead><tr><th scope="col">Rank</th><th scope="col">Game</th><th scope="col">Players now</th><th scope="col">Peak today</th><th scope="col">Rating</th><th scope="col"><span className="sr-only">Game details</span></th></tr></thead><tbody>{leaders.map((game, index) => {
       const peak = Math.max(0, game.peakToday || 0, game.currentPlayers || 0);
       const fill = peak > 0 ? Math.min(100, Math.max(0, game.currentPlayers / peak * 100)) : 0;
