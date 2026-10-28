@@ -67,7 +67,10 @@ void runWebsiteServer(DashboardState& state) {
         {"/index.html", {"index.html", "text/html; charset=utf-8"}},
         {"/css/style.css", {"css/style.css", "text/css; charset=utf-8"}},
         {"/assets/dashboard.bundle.js", {"assets/dashboard.bundle.js", "text/javascript; charset=utf-8"}},
-        {"/favicon.svg", {"favicon.svg", "image/svg+xml"}}
+        {"/favicon.svg", {"favicon.svg", "image/svg+xml"}},
+        {"/images/gdaw-logo.png", {"images/gdaw-logo.png", "image/png"}},
+        {"/images/gdaw-head.png", {"images/gdaw-head.png", "image/png"}},
+        {"/images/cat-cursor.png", {"images/cat-cursor.png", "image/png"}}
     };
     for (const auto& [path, file] : files) {
         server.Get(path, [&, file](const auto&, auto& response) {

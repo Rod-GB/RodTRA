@@ -57,8 +57,12 @@
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 
 /* Center the shared icon and distinguish the two top-level pages. */
-.brand-mark { overflow: hidden; letter-spacing: 0; line-height: 1; }
-.brand-mark img { display: block; width: 100%; height: 100%; }
+.brand-mark { overflow: hidden; letter-spacing: 0; line-height: 1; width: 40px; height: 56px; flex-shrink: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.brand-mark img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.sidebar-emblem { width: 56px; height: 56px; letter-spacing: 0; }
+.sidebar-emblem img { width: 100%; height: 100%; object-fit: contain; }
+@media(max-width:720px) { .brand-mark { width: 34px; height: 48px; } }
+
 .main-nav { display: flex; gap: 28px; }
 .main-nav a { border-bottom-color: transparent; color: var(--muted); }
 .main-nav a[aria-current="page"] { color: var(--text); border-bottom-color: var(--accent); }
@@ -202,4 +206,14 @@ a:hover,.text-link:hover,.quiet-button:hover,.card-content h3 button:hover,.libr
  .library-view .page-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
  .library-view .library-total{padding-top:28px;text-align:right;max-width:84px;font-size:27px}
  .library-view .library-total>span{font-size:11px;line-height:1.5}
+}
+
+/* Native image cursor on mouse devices; typing and disabled controls keep their usual cues. */
+@media (hover: hover) and (pointer: fine) {
+  body { cursor: url('/images/cat-cursor.png') 4 21, auto; }
+  :is(a, button, select, summary, [role="button"], label[for], .genre-choices label,
+    input[type="checkbox"], input[type="radio"]) { cursor: url('/images/cat-cursor.png') 4 21, pointer; }
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="button"]):not([type="submit"]),
+  textarea, [contenteditable="true"] { cursor: text; }
+  button:disabled, input:disabled, select:disabled, .genre-choices label:has(input:disabled) { cursor: default; }
 }

@@ -136,6 +136,6 @@ export default function Sidebar({ view, open, onNavigate }) {
       }}>
       <Icon name={icon}/><span>{label}</span><Icon name="arrow" className="nav-arrow"/>
     </a>)}</nav>
-    <div className="sidebar-bottom"><span className="sidebar-emblem" aria-hidden="true">G</span><p>Steam. Epic.<br/><strong>itch.io.</strong></p></div>
+    <div className="sidebar-bottom"><span className="sidebar-emblem" aria-hidden="true"><img src="/images/gdaw-head.png" width="64" height="64" alt=""/></span><p>Steam. Epic.<br/><strong>itch.io.</strong></p></div>
   </aside>;
 }

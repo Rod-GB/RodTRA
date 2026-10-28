@@ -24,6 +24,7 @@ WORKDIR /app
 COPY --from=backend-build /source/build/rodtra /usr/local/bin/rodtra
 COPY frontend/index.html frontend/favicon.svg ./frontend/
 COPY frontend/css ./frontend/css
+COPY frontend/images ./frontend/images
 COPY --from=frontend-build /frontend/assets ./frontend/assets
 USER 10001:10001
 ENV PORT=10000
