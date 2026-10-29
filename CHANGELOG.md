@@ -1,5 +1,14 @@
 # Gdaw website updates
 
+## 2026-10-29 | Version 1.3.1 — Discount/Price
+
+### Improvements
+
+- Renamed Discounts to Discount/Price.
+- Shows paid games at regular and sale prices by default.
+- Free-to-play games and giveaways stay in All Games and Genres.
+- Use On sale only to narrow the list to paid discounts.
+
 ## 2026-10-29 | Version 1.3.0 — Game sets for your budget
 
 ### New features

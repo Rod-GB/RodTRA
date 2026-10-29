@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './Icon';
 
-const items = [['dashboard', 'Dashboard', 'dashboard'], ['all-games', 'All Games', 'library'], ['genres', 'Genres', 'genres'], ['most-played', 'Most Played', 'trophy'], ['discounts', 'Discounts', 'library'], ['budget', 'Budget Finder', 'search']];
+const items = [['dashboard', 'Dashboard', 'dashboard'], ['all-games', 'All Games', 'library'], ['genres', 'Genres', 'genres'], ['most-played', 'Most Played', 'trophy'], ['discounts', 'Discount/Price', 'library'], ['budget', 'Budget Finder', 'search']];
 const motionMilliseconds = 1000;
 const exitMilliseconds = 800;
 const mouseCanHover = () => window.matchMedia('(hover: hover) and (pointer: fine)').matches;
