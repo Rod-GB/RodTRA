@@ -19,7 +19,16 @@ inline bool gameplayGenre(const std::string& genre) {
 // Offer choices come from the store's complete genre list, not a fixed whitelist.
 inline bool catalogGenre(const std::string& genre) {
     return !genre.empty() && genre.size() <= 80 &&
-        std::none_of(genre.begin(), genre.end(), [](unsigned char c) { return c < 32; });
+        std::none_of(genre.begin(), genre.end(), [](unsigned char c) { return c < 32; }) &&
+        std::any_of(genre.begin(), genre.end(), [](unsigned char c) { return !std::isspace(c); });
+}
+
+inline bool hasCatalogGenre(const Json& game) {
+    const auto genres = game.find("genres");
+    return genres != game.end() && genres->is_array() &&
+        std::any_of(genres->begin(), genres->end(), [](const Json& genre) {
+            return genre.is_string() && catalogGenre(genre.get<std::string>());
+        });
 }
 
 struct ItchCheckRetry { long long projectAt, collectionAt; };

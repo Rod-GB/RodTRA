@@ -2,6 +2,7 @@
 #include "content_cache.h"
 #include "../network/http_client.h"
 #include "../algorithms/budget_filter.h"
+#include "../algorithms/epic_genres.h"
 #include <libxml/HTMLparser.h>
 #include <libxml/xpath.h>
 #include <chrono>
@@ -143,12 +144,22 @@ Json fetchSteamExtra(int appID) {
 }
 
 Json fetchEpic() {
-    const auto rows = requestJson("https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=PH&allowCountries=PH")
-        .at("data").at("Catalog").at("searchStore").at("elements");
+    return parseEpicPromotions(requestJson("https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=en-US&country=PH&allowCountries=PH"), std::time(nullptr));
+}
+
+Json fetchItch() {
+    return {{"games", parseItchListings(requestText("https://itch.io/games/newest/released.xml"))},
+        {"updatedAt", std::time(nullptr)}, {"message", ""}};
+}
+}
+
+Json parseEpicPromotions(const Json& payload, long long now) {
+    const auto& rows = payload.at("data").at("Catalog").at("searchStore").at("elements");
+    if (!rows.is_array()) throw std::runtime_error("Epic returned an unreadable collection.");
     Json games = Json::array();
-    const auto now = std::time(nullptr);
     std::set<std::string> seen;
     for (const auto& row : rows) {
+        try {
         if (row.value("offerType", "") != "BASE_GAME" || row.value("isCodeRedemptionOnly", false)) continue;
         const auto promotions = row.value("promotions", Json());
         if (!promotions.is_object()) continue;
@@ -159,7 +170,7 @@ Json fetchEpic() {
         }
         if (!end || row.at("price").at("totalPrice").value("discountPrice", -1LL) != 0) continue;
         const auto id = row.value("id", "");
-        if (id.empty() || !seen.insert(id).second) continue;
+        if (id.empty() || seen.count(id)) continue;
         std::string slug;
         for (const auto& mapping : row.value("offerMappings", Json::array())) if (mapping.value("pageType", "") == "productHome") slug = mapping.value("pageSlug", "");
         if (slug.empty() && row.contains("catalogNs")) for (const auto& mapping : row.at("catalogNs").value("mappings", Json::array())) if (mapping.value("pageType", "") == "productHome") slug = mapping.value("pageSlug", "");
@@ -181,18 +192,13 @@ Json fetchEpic() {
             {"endsAt", end}, {"checkedAt", now}, {"stale", false}};
         games.push_back({{"id", id}, {"source", "epic"}, {"title", row.value("title", "")}, {"description", row.value("description", "")},
             {"image", image}, {"url", "https://store.epicgames.com/en-US/p/" + slug}, {"endsAt", end},
-            {"publisher", publisher}, {"studio", studio}, {"releaseDate", ""}, {"genres", Json::array()}, {"price", price},
+            {"publisher", publisher}, {"studio", studio}, {"releaseDate", ""}, {"genres", epicGenreNames(row, slug)}, {"price", price},
             {"screenshots", Json::array()}, {"priceLabel", "Free to keep"}});
+        seen.insert(id);
         if (games.size() >= 50) break;
+        } catch (...) { /* One malformed offer must not hide the other free games. */ }
     }
-    return {{"games", games}, {"updatedAt", now}, {"message", ""}, {"region", "Philippines"},
-        {"genresMessage", "Epic doesn't list genres for these free games."}};
-}
-
-Json fetchItch() {
-    return {{"games", parseItchListings(requestText("https://itch.io/games/newest/released.xml"))},
-        {"updatedAt", std::time(nullptr)}, {"message", ""}};
-}
+    return {{"games", games}, {"updatedAt", now}, {"message", ""}, {"region", "Philippines"}};
 }
 
 Json parseItchListings(const std::string& xml) {
@@ -292,7 +298,7 @@ Json storeCollection(const std::string& store) {
     Json result = store == "epic" ? epic : itch;
     const auto now = std::time(nullptr);
     Json current = Json::array();
-    int pending = 0, excluded = 0;
+    int pending = 0, excluded = 0, missingGenres = 0;
     for (auto game : result["games"]) {
         if (store == "epic" && game.value("endsAt", 0LL) <= now) continue;
         if (store == "itch") {
@@ -301,11 +307,16 @@ Json storeCollection(const std::string& store) {
             const auto sale = itchSalePrices.find(game.value("id", ""));
             if (sale != itchSalePrices.end() && sale->second.value("checkedAt", 0LL) >= game["price"].value("checkedAt", 0LL)) game["price"] = sale->second;
         }
+        if (!hasCatalogGenre(game)) {
+            ++missingGenres;
+            if (store == "itch") { ++excluded; continue; }
+        }
         if (game.contains("price") && game["price"].value("available", false)) game["price"]["stale"] = !currentPrice(game["price"], now);
         current.push_back(std::move(game));
     }
     result["games"] = std::move(current);
     result["pendingChecks"] = pending; result["excludedListings"] = excluded;
+    result["missingGenres"] = missingGenres;
     result["ready"] = result.value("updatedAt", 0LL) > 0;
     result["stale"] = now - result.value("updatedAt", 0LL) >= 1800;
     result["state"] = result.value("ready", false) ? (result.value("stale", true) || !result.value("message", "").empty() ? "saved" : pending > 0 ? "checking" : "ready") : result.value("message", "").rfind("Connecting", 0) == 0 ? "loading" : "unavailable";

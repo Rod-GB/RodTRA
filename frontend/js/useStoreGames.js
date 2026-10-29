@@ -12,8 +12,11 @@ export function useStoreGames(platform) {
     return () => { clearInterval(timer); document.removeEventListener('visibilitychange', tick); };
   }, []);
   const games = (remote.data?.games || []).filter(game => game.source === platform && (platform !== 'epic' || game.endsAt * 1000 > clock)).map(game => ({ ...game,
+    genres: (Array.isArray(game.genres) ? game.genres : [])
+      .filter(genre => typeof genre === 'string' && genre.trim() && genre.length <= 80 && !/[\u0000-\u001f]/.test(genre))
+      .map(genre => genre.trim()),
     price: game.price && { ...game.price, stale: !!game.price.stale || clock / 1000 - game.price.checkedAt >= 1800 || game.price.endsAt > 0 && game.price.endsAt * 1000 <= clock },
-  }));
+  })).filter(game => platform !== 'itch' || game.genres.length > 0);
   const genres = [...new Set(games.flatMap(game => game.genres || []))].sort((a, b) => a.localeCompare(b));
   return { ...remote, games, genres };
 }

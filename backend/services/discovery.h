@@ -13,3 +13,4 @@ Json catalogSummary(DashboardState& state);
 // Pure source parsers are also used by the backend regression checks.
 Json parseItchListings(const std::string& xml);
 Json parseItchPageMetadata(const std::string& html, const Json& listing);
+Json parseEpicPromotions(const Json& payload, long long now);

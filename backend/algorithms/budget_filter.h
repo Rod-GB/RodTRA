@@ -63,7 +63,6 @@ inline Json filterBudget(const std::vector<Json>& source, const Json& input) {
     if (!std::isfinite(minimum) || minimum < 0 || minimum > (platform == "itch" ? 5 : platform == "epic" ? 0 : 100)) throw std::invalid_argument("Rating must be between 0 and 100.");
     const auto genres = input.value("genres", std::vector<std::string>{});
     if (genres.size() > 3) throw std::invalid_argument("Choose up to three genres.");
-    if (platform == "epic" && !genres.empty()) throw std::invalid_argument("Genre information is unavailable for these giveaways.");
     for (const auto& genre : genres) if (!catalogGenre(genre) || std::none_of(source.begin(), source.end(), [&](const auto& game) {
         const auto supplied = game.value("genres", std::vector<std::string>{});
         return game.value("source", "steam") == platform && std::find(supplied.begin(), supplied.end(), genre) != supplied.end();
@@ -80,13 +79,30 @@ inline Json filterBudget(const std::vector<Json>& source, const Json& input) {
         const auto price = game.value("price", Json::object());
         if (!currentPrice(price, std::time(nullptr))) { ++unavailable; continue; }
         if (price.value("currency", "") != currency) { ++otherCurrencies; continue; }
-        if (price.at("final").get<long long>() > maximum || (minimum > 0 && offerRating(game) < minimum)) continue;
+        const auto cost = price.value("final", -1LL);
+        if (cost < 0) { ++unavailable; continue; }
+        if (cost > maximum || (minimum > 0 && offerRating(game) < minimum)) continue;
         if (!genres.empty() && std::none_of(genres.begin(), genres.end(), [&](const auto& g) { return std::find(tags.begin(), tags.end(), g) != tags.end(); })) continue;
-        if (price.value("free", false)) {
+        if (cost == 0) {
             if (input.value("includeFree", false)) free.push_back(std::move(game));
         } else if (!input.value("saleOnly", false) || price.value("discount", 0) > 0) paid.push_back(std::move(game));
     }
-    quickSortOffers(paid, 0, static_cast<int>(paid.size()) - 1, order);
+    const auto candidateCount = paid.size() + free.size();
+    // All matching paid games have positive costs. Taking them cheapest first
+    // gives the largest possible number of games within one total budget.
+    // Ratings break equal-price ties; this is not a maximum-spend knapsack.
+    quickSortOffers(paid, 0, static_cast<int>(paid.size()) - 1, "price");
+    std::vector<Json> chosen;
+    long long total = 0;
+    for (auto& game : paid) {
+        const auto cost = game["price"]["final"].get<long long>();
+        if (cost > maximum - total) break;
+        total += cost;
+        chosen.push_back(std::move(game));
+    }
+    quickSortOffers(chosen, 0, static_cast<int>(chosen.size()) - 1, order);
     quickSortOffers(free, 0, static_cast<int>(free.size()) - 1, order);
-    return {{"games", paid}, {"freeGames", free}, {"unavailablePrices", unavailable}, {"otherCurrencies", otherCurrencies}, {"currency", currency}, {"platform", platform}, {"budgetCents", maximum}};
+    return {{"games", chosen}, {"freeGames", free}, {"unavailablePrices", unavailable}, {"otherCurrencies", otherCurrencies},
+        {"currency", currency}, {"platform", platform}, {"budgetCents", maximum}, {"totalCents", total},
+        {"remainingCents", maximum - total}, {"gameCount", chosen.size() + free.size()}, {"candidateCount", candidateCount}, {"selectionMode", "most-games"}};
 }

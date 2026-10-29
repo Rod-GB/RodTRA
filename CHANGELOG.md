@@ -1,5 +1,20 @@
 # Gdaw website updates
 
+## 2026-10-29 | Version 1.3.0 — Game sets for your budget
+
+### New features
+
+- Budget Finder now picks one set of games within your total budget.
+- See how many games were selected, the total price and money left.
+- Choose up to three genres and a minimum rating for your set.
+
+### Improvements
+
+- Epic free games stay visible and are grouped by verified genres where available.
+- Epic games without a listed genre appear under Other free games.
+- itch.io games without a genre are hidden from the catalog.
+- Added the Gdaw logo, browser tab icon and desktop cat cursor.
+
 ## 2026-10-17 | Version 1.2.1 — Easier browsing
 
 ### Improvements

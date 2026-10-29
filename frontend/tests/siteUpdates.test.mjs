@@ -15,7 +15,7 @@ test('website release notes preserve dates, changes and newest-first order', () 
 test('the bundled changelog contains the requested website and genre corrections', async () => {
   const notes = await readFile(new URL('../../CHANGELOG.md', import.meta.url), 'utf8');
   const updates = parseWebsiteUpdates(notes);
-  assert.equal(updates[0].date, '2026-10-17');
+  assert.equal(updates[0].date, '2026-10-29');
   assert.equal(updates.length, (notes.match(/^## /gm) || []).length);
   const changes = updates.find(update => update.date === '2026-10-12').groups.flatMap(group => group.items).join(' ');
   assert.match(changes, /Gdaw website/);
