@@ -1,3 +1,11 @@
+/*
+ * Component: DiscountsView
+ * Folder: frontend/js/components
+ * File: DiscountsView.jsx
+ * Purpose: Shows regular and discounted paid prices for Steam and itch.io
+ *   while leaving free games out of this page.
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useGames } from '../useGames';
 import { useStoreGames } from '../useStoreGames';

@@ -1,3 +1,10 @@
+/*
+ * Tests: navigation.test.mjs
+ * Folder: frontend/tests
+ * File: navigation.test.mjs
+ * Purpose: Checks browser route reading and writing.
+ */
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readRoute, routeURL } from '../js/navigation.js';

@@ -1,3 +1,11 @@
+<!--
+Document: README.md
+Folder: Project root
+File: README.md
+Purpose: Provides the project overview, setup instructions, feature notes
+  and source limits.
+-->
+
 # Gdaw
 
 A player-focused game discovery website with a crimson-and-black dashboard, an All Games library, click-to-browse genres, a Most Played leaderboard, and website release notes under Updates.

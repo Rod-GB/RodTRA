@@ -1,3 +1,10 @@
+/*
+ * Module: api_routes.cpp
+ * Folder: backend/server
+ * File: api_routes.cpp
+ * Purpose: Prepares Steam lists and individual Steam game replies.
+ */
+
 #include "api_routes.h"
 #include "../algorithms/binary_search.h"
 #include "../algorithms/genre_filter.h"

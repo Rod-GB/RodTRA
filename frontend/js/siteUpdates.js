@@ -1,3 +1,10 @@
+/*
+ * Module: siteUpdates.js
+ * Folder: frontend/js
+ * File: siteUpdates.js
+ * Purpose: Reads the simple structure of the website changelog.
+ */
+
 // Website release notes use the CHANGELOG.md shipped with the source.
 export function parseWebsiteUpdates(markdown) {
   const updates = [];

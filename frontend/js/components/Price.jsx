@@ -1,3 +1,10 @@
+/*
+ * Component: Price
+ * Folder: frontend/js/components
+ * File: Price.jsx
+ * Purpose: Displays a supplied price consistently.
+ */
+
 import React from 'react';
 import { money, timestamp } from '../format';
 

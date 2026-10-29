@@ -1,3 +1,11 @@
+/*
+ * Struct: DashboardState
+ * Folder: backend/services
+ * File: dashboard_state.h
+ * Purpose: Keeps the game lists and refresh status shared by the background
+ *   workers and web requests.
+ */
+
 #pragma once
 #include "../models/game.h"
 #include <mutex>

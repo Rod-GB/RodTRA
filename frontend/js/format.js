@@ -1,3 +1,11 @@
+/*
+ * Module: format.js
+ * Folder: frontend/js
+ * File: format.js
+ * Purpose: Keeps common number, date, money, rating and image formatting
+ *   consistent.
+ */
+
 export const number = value => new Intl.NumberFormat().format(value || 0);
 export const compact = value => new Intl.NumberFormat(undefined, { notation: 'compact', maximumFractionDigits: 1 }).format(value);
 export const time = value => value ? new Date(value * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Not updated yet';

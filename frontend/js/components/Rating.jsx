@@ -1,3 +1,10 @@
+/*
+ * Component: Rating
+ * Folder: frontend/js/components
+ * File: Rating.jsx
+ * Purpose: Draws a Steam positive-review percentage and label.
+ */
+
 import React from 'react';
 import { number, percent, ratingClass } from '../format';
 

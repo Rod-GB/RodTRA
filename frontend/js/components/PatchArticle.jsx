@@ -1,3 +1,10 @@
+/*
+ * Component: PatchArticle
+ * Folder: frontend/js/components
+ * File: PatchArticle.jsx
+ * Purpose: Draws one Steam developer post.
+ */
+
 import React from 'react';
 import { date } from '../format';
 import Icon from './Icon';

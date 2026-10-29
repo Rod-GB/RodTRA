@@ -1,3 +1,10 @@
+/*
+ * Component: Dashboard
+ * Folder: frontend/js
+ * File: dashboard.jsx
+ * Purpose: Connects the frontend pages into one browser application.
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { useGames } from './useGames';

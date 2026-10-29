@@ -1,3 +1,11 @@
+/*
+ * Component: Masthead
+ * Folder: frontend/js/components
+ * File: Masthead.jsx
+ * Purpose: Draws the top logo, Homepage and Updates links, data status and
+ *   mobile menu button.
+ */
+
 import React from 'react';
 import Icon from './Icon';
 

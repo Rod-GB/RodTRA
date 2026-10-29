@@ -1,3 +1,10 @@
+/*
+ * Component: GameCard
+ * Folder: frontend/js/components
+ * File: GameCard.jsx
+ * Purpose: Draws one Steam game card and opens its details on request.
+ */
+
 import React from 'react';
 import Rating from './Rating';
 import Price from './Price';

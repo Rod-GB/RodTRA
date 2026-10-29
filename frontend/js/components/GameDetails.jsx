@@ -1,3 +1,12 @@
+/*
+ * Component: GameDetails
+ * Folder: frontend/js/components
+ * File: GameDetails.jsx
+ * Purpose: Shows the Steam game dialog and its Overview, Reviews and Updates
+ *   tabs.
+ */
+
+import Icon from './Icon';
 import React, { useEffect, useRef, useState } from 'react';
 import PlayerChart from './PlayerChart';
 import Rating from './Rating';
@@ -39,7 +48,7 @@ export default function GameDetails({ appID, onClose, section = 'overview', onSe
       if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.current.close();
     }
   }}>
-    <button className="dialog-close" onClick={() => dialog.current.close()} aria-label="Close game details">×</button>
+    <div className="dialog-actions"><button className="dialog-close" onClick={() => dialog.current.close()} aria-label="Close game details"><Icon name="close" width="22" height="22"/></button></div>
     {error && <p className="notice" role="alert">{error}</p>}
     {!game ? <h2 id="detail-title">{error ? 'Game unavailable' : 'Loading game…'}</h2> : <>
       <header className="detail-header">{steamImage(game.image) && <img src={steamImage(game.image)} alt=""/>}<div><span className="eyebrow">STEAM GAME</span><h2 id="detail-title">{game.title}</h2><p className="muted">{game.genres.join(' · ')}</p>

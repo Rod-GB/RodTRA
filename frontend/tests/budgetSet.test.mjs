@@ -1,3 +1,11 @@
+/*
+ * Tests: budgetSet.test.mjs
+ * Folder: frontend/tests
+ * File: budgetSet.test.mjs
+ * Purpose: Checks combined prices, money left, currency separation and
+ *   removal of expired offers from the displayed set.
+ */
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { budgetSetSummary } from '../js/budgetSet.js';

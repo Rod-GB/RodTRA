@@ -1,3 +1,11 @@
+/*
+ * Enum: GameOrder
+ * Folder: backend/algorithms
+ * File: quick_sort.h
+ * Purpose: Defines the available sort orders and uses quicksort to put game
+ *   records in the requested order.
+ */
+
 #pragma once
 #include "../models/game.h"
 #include <utility>

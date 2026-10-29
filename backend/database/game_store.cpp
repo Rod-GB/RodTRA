@@ -1,3 +1,10 @@
+/*
+ * Module: game_store.cpp
+ * Folder: backend/database
+ * File: game_store.cpp
+ * Purpose: Translates between Steam records in memory and saved Turso rows.
+ */
+
 #include "game_store.h"
 #include "turso_client.h"
 #include "../config/settings.h"

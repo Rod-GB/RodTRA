@@ -1,3 +1,10 @@
+/*
+ * Module: steam_games.cpp
+ * Folder: backend/steam_api
+ * File: steam_games.cpp
+ * Purpose: Fetches Steam rankings and basic application details.
+ */
+
 #include "steam_games.h"
 #include "../network/http_client.h"
 #include "../config/settings.h"

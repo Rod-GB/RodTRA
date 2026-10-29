@@ -1,3 +1,11 @@
+/*
+ * Component: PlatformSelect
+ * Folder: frontend/js/components
+ * File: PlatformSelect.jsx
+ * Purpose: Draws a store selector using the stores allowed on the current
+ *   page.
+ */
+
 import React from 'react';
 
 export const platformNames = { steam: 'Steam', epic: 'Epic Games', itch: 'itch.io' };

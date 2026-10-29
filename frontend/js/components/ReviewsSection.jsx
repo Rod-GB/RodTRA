@@ -1,3 +1,10 @@
+/*
+ * Component: ReviewsSection
+ * Folder: frontend/js/components
+ * File: ReviewsSection.jsx
+ * Purpose: Shows Steam written-review pages and overall rating context.
+ */
+
 import React, { useState } from 'react';
 import ReviewCard from './ReviewCard';
 import Rating from './Rating';

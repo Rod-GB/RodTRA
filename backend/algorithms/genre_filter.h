@@ -1,3 +1,10 @@
+/*
+ * Module: genre_filter.h
+ * Folder: backend/algorithms
+ * File: genre_filter.h
+ * Purpose: Keeps Steam games whose names and genre labels match the request.
+ */
+
 #pragma once
 #include "../models/game.h"
 #include <cctype>

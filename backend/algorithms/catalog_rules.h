@@ -1,3 +1,11 @@
+/*
+ * Struct: ItchCheckRetry
+ * Folder: backend/algorithms
+ * File: catalog_rules.h
+ * Purpose: Stores retry times and shares rules for valid genres, checked
+ *   itch.io games and current prices.
+ */
+
 #pragma once
 #include "../models/game.h"
 #include <set>

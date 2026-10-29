@@ -1,3 +1,10 @@
+/*
+ * Module: settings.cpp
+ * Folder: backend/config
+ * File: settings.cpp
+ * Purpose: Reads the server listening port from the environment.
+ */
+
 #include "settings.h"
 #include <cstdlib>
 #include <string>

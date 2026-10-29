@@ -1,3 +1,11 @@
+/*
+ * Module: epic_genres.h
+ * Folder: backend/algorithms
+ * File: epic_genres.h
+ * Purpose: Reads explicit Epic genre labels and supplies reviewed genres for
+ *   known games without guessing unknown tags.
+ */
+
 #pragma once
 #include "catalog_rules.h"
 #include <map>

@@ -1,3 +1,10 @@
+/*
+ * Component: PatchBody
+ * Folder: frontend/js/components
+ * File: PatchBody.jsx
+ * Purpose: Converts the parsed post tree into supported React elements.
+ */
+
 import React, { useMemo } from 'react';
 import { parsePatch, safePostLink } from '../patchText';
 import { gameImage } from '../format';

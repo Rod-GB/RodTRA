@@ -1,3 +1,10 @@
+/*
+ * Component: GamesView
+ * Folder: frontend/js/components
+ * File: GamesView.jsx
+ * Purpose: Draws the dashboard overview.
+ */
+
 import React from 'react';
 import GameCard from './GameCard';
 import Icon from './Icon';

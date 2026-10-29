@@ -1,3 +1,12 @@
+/*
+ * Component: StoreGames
+ * Folder: frontend/js/components
+ * File: StoreGames.jsx
+ * Purpose: Displays Epic and itch.io game cards and opens a dialog with the
+ *   available store details.
+ */
+
+import Icon from './Icon';
 import React, { useEffect, useRef, useState } from 'react';
 import { useRemote } from '../useRemote';
 import { gameImage, plainText, timestamp } from '../format';
@@ -15,7 +24,7 @@ function StoreDetails({ game, onClose }) {
   useEffect(() => { dialog.current.showModal(); }, []);
   const latest = latestDeveloperPost(data.posts);
   return <dialog ref={dialog} className="game-dialog" aria-labelledby="store-detail-title" onClose={event => { if (event.target === event.currentTarget) onClose(); }}>
-    <button className="dialog-close" aria-label="Close game details" onClick={() => dialog.current.close()}>×</button>
+    <div className="dialog-actions"><button className="dialog-close" aria-label="Close game details" onClick={() => dialog.current.close()}><Icon name="close" width="22" height="22"/></button></div>
     <header className="detail-header">{gameImage(game.image) && <img src={gameImage(game.image)} alt=""/>}<div><span className="eyebrow">{isItch ? 'ITCH.IO' : 'EPIC GAMES'}</span><h2 id="store-detail-title">{game.title}</h2><a className="store-link" href={game.url} target="_blank" rel="noreferrer">Open on {isItch ? 'itch.io' : 'Epic'} ↗</a></div></header>
     <nav className="detail-nav" aria-label="Game sections">{(isItch ? [['overview','Overview'],['comments','Comments'],['reviews','Reviews'],['updates','Updates']] : [['overview','Overview']]).map(([value,label]) => <button key={value} aria-pressed={tab === value} onClick={() => setTab(value)}>{label}</button>)}</nav>
     {isItch && detail.loading && <p className="small muted" role="status">Loading game details…</p>}

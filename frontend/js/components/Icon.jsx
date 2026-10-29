@@ -1,3 +1,10 @@
+/*
+ * Component: Icon
+ * Folder: frontend/js/components
+ * File: Icon.jsx
+ * Purpose: Provides reusable small vector interface symbols.
+ */
+
 import React from 'react';
 
 const paths = {

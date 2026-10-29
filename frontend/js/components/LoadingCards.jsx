@@ -1,3 +1,10 @@
+/*
+ * Component: LoadingCards
+ * Folder: frontend/js/components
+ * File: LoadingCards.jsx
+ * Purpose: Shows temporary placeholder cards while Steam data is loading.
+ */
+
 import React from 'react';
 
 export default function LoadingCards() {

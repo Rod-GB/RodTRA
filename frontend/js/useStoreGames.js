@@ -1,3 +1,11 @@
+/*
+ * Hook: useStoreGames
+ * Folder: frontend/js
+ * File: useStoreGames.js
+ * Purpose: Reads Epic or itch.io games, removes expired offers and invalid
+ *   itch.io genres, and prepares current price labels.
+ */
+
 import { useEffect, useState } from 'react';
 import { useRemote } from './useRemote';
 

@@ -1,3 +1,10 @@
+/*
+ * Component: ReviewCard
+ * Folder: frontend/js/components
+ * File: ReviewCard.jsx
+ * Purpose: Draws one Steam written review.
+ */
+
 import React from 'react';
 import { number, date } from '../format';
 

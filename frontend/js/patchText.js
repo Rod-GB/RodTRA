@@ -1,3 +1,11 @@
+/*
+ * Module: patchText.js
+ * Folder: frontend/js
+ * File: patchText.js
+ * Purpose: Prepares supported developer-post markup for safe readable
+ *   display.
+ */
+
 import { plainText, gameImage } from './format';
 
 const escape = value => value.replace(/[&<>"]/g, letter => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[letter]));

@@ -1,3 +1,10 @@
+/*
+ * Hook: useGames
+ * Folder: frontend/js
+ * File: useGames.js
+ * Purpose: Requests the Steam list using the current list choices.
+ */
+
 import { useEffect, useState } from 'react';
 
 // C++ handles searching, filtering and sorting through this request.

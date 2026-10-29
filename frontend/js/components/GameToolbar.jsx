@@ -1,3 +1,10 @@
+/*
+ * Component: GameToolbar
+ * Folder: frontend/js/components
+ * File: GameToolbar.jsx
+ * Purpose: Draws the All Games search and filter controls.
+ */
+
 import React from 'react';
 import PlatformSelect from './PlatformSelect';
 

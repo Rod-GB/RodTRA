@@ -1,3 +1,11 @@
+/*
+ * Hook: useRemote
+ * Folder: frontend/js
+ * File: useRemote.js
+ * Purpose: Provides reusable read or POST requests for public game
+ *   information.
+ */
+
 import { useEffect, useState } from 'react';
 
 // Public data only is shared on the server. Requests are cancelled on page exit.

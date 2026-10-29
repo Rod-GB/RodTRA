@@ -1,3 +1,10 @@
+/*
+ * Module: steam_reviews.cpp
+ * Folder: backend/steam_api
+ * File: steam_reviews.cpp
+ * Purpose: Gets Steam review totals and pages of written reviews.
+ */
+
 #include "steam_reviews.h"
 #include "../network/http_client.h"
 #include <ctime>

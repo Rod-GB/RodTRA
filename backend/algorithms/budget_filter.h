@@ -1,3 +1,11 @@
+/*
+ * Module: budget_filter.h
+ * Folder: backend/algorithms
+ * File: budget_filter.h
+ * Purpose: Checks budget choices, sorts matching games by price, and selects
+ *   one set within the total budget.
+ */
+
 #pragma once
 #include "../models/game.h"
 #include <algorithm>

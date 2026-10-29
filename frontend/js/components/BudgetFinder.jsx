@@ -1,3 +1,11 @@
+/*
+ * Component: BudgetFinder
+ * Folder: frontend/js/components
+ * File: BudgetFinder.jsx
+ * Purpose: Collects a total budget, genres and rating, then displays one
+ *   selected game set and its combined price.
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 import GameCard from './GameCard';
 import StoreGames from './StoreGames';

@@ -1,3 +1,10 @@
+/*
+ * Module: main.cpp
+ * Folder: backend
+ * File: main.cpp
+ * Purpose: Starts and stops the backend as one connected system.
+ */
+
 #include "config/settings.h"
 #include "services/refresh_games.h"
 #include "services/discovery.h"

@@ -1,3 +1,8 @@
+# Build configuration: CMakeLists.txt
+# Folder: backend
+# File: CMakeLists.txt
+# Purpose: Describes how the backend source becomes a program.
+
 cmake_minimum_required(VERSION 3.24)
 project(Gdaw LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)

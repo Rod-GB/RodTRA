@@ -1,3 +1,11 @@
+/*
+ * Component: PlayerChart
+ * Folder: frontend/js/components
+ * File: PlayerChart.jsx
+ * Purpose: Draws saved Steam player-history readings and explains a selected
+ *   reading in the chart tooltip.
+ */
+
 import React, { useState } from 'react';
 import { ResponsiveContainer, AreaChart, Area, CartesianGrid, XAxis, YAxis, Tooltip, Brush } from 'recharts';
 import { compact, number, time, timestamp } from '../format';

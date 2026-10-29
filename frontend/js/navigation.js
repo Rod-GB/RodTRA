@@ -1,3 +1,10 @@
+/*
+ * Module: navigation.js
+ * Folder: frontend/js
+ * File: navigation.js
+ * Purpose: Translates between the browser hash address and page choices.
+ */
+
 // Keep each page and its filters independently addressable.
 export function readRoute() {
   const [path, query = ''] = window.location.hash.slice(1).split('?');

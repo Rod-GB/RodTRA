@@ -1,3 +1,11 @@
+/*
+ * Module: settings.h
+ * Folder: backend/config
+ * File: settings.h
+ * Purpose: Gives important backend limits and refresh targets one shared
+ *   home.
+ */
+
 #pragma once
 
 // change refresh timing here, not inside the Steam code.

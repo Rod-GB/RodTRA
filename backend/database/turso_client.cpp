@@ -1,3 +1,10 @@
+/*
+ * Module: turso_client.cpp
+ * Folder: backend/database
+ * File: turso_client.cpp
+ * Purpose: Sends the backend's database instructions to Turso over HTTPS.
+ */
+
 #include "turso_client.h"
 #include "../network/http_client.h"
 #include <cstdlib>

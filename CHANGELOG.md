@@ -1,3 +1,10 @@
+<!--
+Document: CHANGELOG.md
+Folder: Project root
+File: CHANGELOG.md
+Purpose: Contains the history of changes to Gdaw itself.
+-->
+
 # Gdaw website updates
 
 ## 2026-10-29 | Version 1.3.1 — Discount/Price

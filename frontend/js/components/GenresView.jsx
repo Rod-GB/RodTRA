@@ -1,3 +1,11 @@
+/*
+ * Component: GenresView
+ * Folder: frontend/js/components
+ * File: GenresView.jsx
+ * Purpose: Shows genre categories and their games, with a separate category
+ *   for Epic games whose genres are unknown.
+ */
+
 import React from 'react';
 import GenreGrid from './GenreGrid';
 import GameCard from './GameCard';

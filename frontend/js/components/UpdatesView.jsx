@@ -1,3 +1,10 @@
+/*
+ * Component: UpdatesView
+ * Folder: frontend/js/components
+ * File: UpdatesView.jsx
+ * Purpose: Draws Gdaw's own website release history.
+ */
+
 import React from 'react';
 import changelog from '../../../CHANGELOG.md';
 import { parseWebsiteUpdates } from '../siteUpdates';

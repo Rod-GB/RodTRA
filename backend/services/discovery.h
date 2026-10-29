@@ -1,3 +1,11 @@
+/*
+ * Module: discovery.h
+ * Folder: backend/services
+ * File: discovery.h
+ * Purpose: Declares store refresh, game details, catalog counts, budget
+ *   results and provider parsing functions.
+ */
+
 #pragma once
 #include "dashboard_state.h"
 

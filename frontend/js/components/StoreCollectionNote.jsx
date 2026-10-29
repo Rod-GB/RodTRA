@@ -1,3 +1,11 @@
+/*
+ * Component: StoreCollectionNote
+ * Folder: frontend/js/components
+ * File: StoreCollectionNote.jsx
+ * Purpose: Gives the itch.io list a brief scope label and optional
+ *   explanation.
+ */
+
 import React from 'react';
 import { timestamp } from '../format';
 

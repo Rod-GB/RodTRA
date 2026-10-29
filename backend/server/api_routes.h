@@ -1,3 +1,10 @@
+/*
+ * Module: api_routes.h
+ * Folder: backend/server
+ * File: api_routes.h
+ * Purpose: Declares the Steam reply functions and query-parameter type.
+ */
+
 #pragma once
 #include "../services/dashboard_state.h"
 #include <map>

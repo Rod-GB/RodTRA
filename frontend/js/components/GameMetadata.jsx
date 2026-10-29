@@ -1,3 +1,11 @@
+/*
+ * Component: GameMetadata
+ * Folder: frontend/js/components
+ * File: GameMetadata.jsx
+ * Purpose: Displays the release date, latest available developer post,
+ *   publisher and studio for a game.
+ */
+
 import React from 'react';
 import { timestamp } from '../format';
 import { latestDeveloperPost } from '../gameInfo';

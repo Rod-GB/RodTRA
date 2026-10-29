@@ -1,3 +1,10 @@
+/*
+ * Component: AllGamesView
+ * Folder: frontend/js/components
+ * File: AllGamesView.jsx
+ * Purpose: Builds the searchable library page for the chosen store.
+ */
+
 import React, { useEffect, useState } from 'react';
 import { useGames } from '../useGames';
 import { number, steamImage } from '../format';

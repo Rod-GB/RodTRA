@@ -1,3 +1,10 @@
+/*
+ * Hook: useSteamPages
+ * Folder: frontend/js
+ * File: useSteamPages.js
+ * Purpose: Loads and combines successive Steam review or update pages.
+ */
+
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Refresh the head without removing older pages or resetting the reader.

@@ -1,3 +1,11 @@
+/*
+ * Hook: useRandomGames
+ * Folder: frontend/js
+ * File: useRandomGames.js
+ * Purpose: Keeps varied Steam dashboard picks without reshuffling on every
+ *   count refresh.
+ */
+
 import { useEffect, useState } from 'react';
 
 // Fisher-Yates shuffles IDs once; count updates keep the same picks.

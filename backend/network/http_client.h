@@ -1,3 +1,11 @@
+/*
+ * Class: OnlineError
+ * Folder: backend/network
+ * File: http_client.h
+ * Purpose: Defines OnlineError with retry details and declares the shared
+ *   HTTPS request functions.
+ */
+
 #pragma once
 #include "../models/game.h"
 #include <stdexcept>

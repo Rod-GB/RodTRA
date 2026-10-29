@@ -1,3 +1,11 @@
+/*
+ * Module: content_cache.cpp
+ * Folder: backend/services
+ * File: content_cache.cpp
+ * Purpose: Reuses recent content replies and shares matching in-progress
+ *   fetches.
+ */
+
 #include "content_cache.h"
 #include "../network/http_client.h"
 #include <map>

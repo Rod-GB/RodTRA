@@ -1,3 +1,11 @@
+/*
+ * Module: binary_search.h
+ * Folder: backend/algorithms
+ * File: binary_search.h
+ * Purpose: Finds the position of a Steam AppID in a vector already sorted by
+ *   ID.
+ */
+
 #pragma once
 #include "quick_sort.h"
 

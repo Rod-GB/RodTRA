@@ -1,3 +1,11 @@
+/*
+ * Module: budgetSet.js
+ * Folder: frontend/js
+ * File: budgetSet.js
+ * Purpose: Recalculates the displayed game count, total price and money left
+ *   when offers expire.
+ */
+
 // Recompute the visible set when an offer expires; no choices are persisted.
 export function budgetSetSummary(result, now = Date.now()) {
   const current = game => {

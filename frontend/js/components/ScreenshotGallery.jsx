@@ -1,3 +1,12 @@
+/*
+ * Component: ScreenshotGallery
+ * Folder: frontend/js/components
+ * File: ScreenshotGallery.jsx
+ * Purpose: Shows available screenshots and lets the player browse/enlarge
+ *   them.
+ */
+
+import Icon from './Icon';
 import React, { useRef, useState } from 'react';
 import { gameImage } from '../format';
 
@@ -21,7 +30,7 @@ export default function ScreenshotGallery({ screenshots = [], title }) {
     <div className="gallery-controls"><button className="quiet-button" onClick={() => move(-1)} aria-label="Previous screenshot">← Previous</button><span className="small muted">Tap to enlarge · Swipe to browse</span><button className="quiet-button" onClick={() => move(1)} aria-label="Next screenshot">Next →</button></div>
     <div className="gallery-thumbnails">{images.map((shot, i) => <button key={shot.full} aria-label={`Show screenshot ${i + 1}`} aria-pressed={index === i} onClick={() => setSelected(i)}><img src={gameImage(shot.thumbnail) || gameImage(shot.full)} alt="" loading="lazy"/></button>)}</div>
     <dialog ref={dialog} className="image-dialog" aria-label={`${title} enlarged screenshot`} onClick={event => { if (event.target === dialog.current) dialog.current.close(); }} onKeyDown={event => { if (event.key === 'ArrowRight') move(1); if (event.key === 'ArrowLeft') move(-1); }}>
-      <button className="dialog-close" aria-label="Close enlarged screenshot" onClick={() => dialog.current.close()}>×</button>
+      <button className="dialog-close" aria-label="Close enlarged screenshot" onClick={() => dialog.current.close()}><Icon name="close" width="22" height="22"/></button>
       <img src={gameImage(images[index].full)} alt={`${title} gameplay screenshot ${index + 1}`} {...gestures}/>
       <div className="gallery-controls"><button className="quiet-button" onClick={() => move(-1)}>← Previous</button><span>{index + 1} / {images.length}</span><button className="quiet-button" onClick={() => move(1)}>Next →</button></div>
     </dialog>

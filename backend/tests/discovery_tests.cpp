@@ -1,3 +1,11 @@
+/*
+ * Module: discovery_tests.cpp
+ * Folder: backend/tests
+ * File: discovery_tests.cpp
+ * Purpose: Checks catalog rules, Epic offers, ratings, money calculations
+ *   and total-budget sets using controlled examples.
+ */
+
 #include "../services/discovery.h"
 #include "../algorithms/budget_filter.h"
 #include "../algorithms/epic_genres.h"

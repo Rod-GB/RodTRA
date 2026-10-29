@@ -1,3 +1,11 @@
+/*
+ * Component: GenreGrid
+ * Folder: frontend/js/components
+ * File: GenreGrid.jsx
+ * Purpose: Draws clickable genre tiles with game pictures, names and
+ *   matching game counts.
+ */
+
 import React from 'react';
 import Icon from './Icon';
 import { gameImage } from '../format';

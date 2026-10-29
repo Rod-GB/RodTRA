@@ -1,3 +1,11 @@
+/*
+ * Structs: PlayerReading, Review, Game
+ * Folder: backend/models
+ * File: game.h
+ * Purpose: Groups player-history readings, written reviews and game
+ *   information into records that can be sent as JSON.
+ */
+
 #pragma once
 #include <string>
 #include <vector>

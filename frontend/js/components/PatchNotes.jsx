@@ -1,3 +1,10 @@
+/*
+ * Component: PatchNotes
+ * Folder: frontend/js/components
+ * File: PatchNotes.jsx
+ * Purpose: Builds the Steam Patches and updates section.
+ */
+
 import React from 'react';
 import { timestamp } from '../format';
 import PatchArticle from './PatchArticle';

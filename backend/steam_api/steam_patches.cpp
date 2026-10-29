@@ -1,3 +1,10 @@
+/*
+ * Module: steam_patches.cpp
+ * Folder: backend/steam_api
+ * File: steam_patches.cpp
+ * Purpose: Gets and labels Steam developer announcements and updates.
+ */
+
 #include "steam_patches.h"
 #include "../network/http_client.h"
 #include <ctime>

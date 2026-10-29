@@ -1,3 +1,9 @@
+# Build configuration: Dockerfile
+# Folder: Project root
+# File: Dockerfile
+# Purpose: Packages the frontend and C++ backend into the Linux image used
+#   by Render.
+
 # Render builds the frontend and C++ backend automatically.
 FROM node:22-bookworm-slim AS frontend-build
 WORKDIR /frontend

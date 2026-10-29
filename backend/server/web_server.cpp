@@ -1,3 +1,11 @@
+/*
+ * Module: web_server.cpp
+ * Folder: backend/server
+ * File: web_server.cpp
+ * Purpose: Accepts browser requests and sends approved files or JSON
+ *   replies.
+ */
+
 #include "web_server.h"
 #include "api_routes.h"
 #include "content_routes.h"

@@ -1,3 +1,11 @@
+/*
+ * Struct: CurlRuntime
+ * Folder: backend/network
+ * File: http_client.cpp
+ * Purpose: Starts and closes the network library, sends HTTPS requests, and
+ *   reads replies within time and size limits.
+ */
+
 #include "http_client.h"
 #include <curl/curl.h>
 #include <memory>

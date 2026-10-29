@@ -1,3 +1,10 @@
+/*
+ * Tests: gameInfo.test.mjs
+ * Folder: frontend/tests
+ * File: gameInfo.test.mjs
+ * Purpose: Checks how the latest available developer post is selected.
+ */
+
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { latestDeveloperPost } from '../js/gameInfo.js';

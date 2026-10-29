@@ -1,3 +1,11 @@
+/*
+ * Component: Sidebar
+ * Folder: frontend/js/components
+ * File: Sidebar.jsx
+ * Purpose: Draws the side navigation and manages its mouse, keyboard and
+ *   touch feedback.
+ */
+
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './Icon';
 

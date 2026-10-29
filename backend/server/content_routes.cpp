@@ -1,3 +1,11 @@
+/*
+ * Module: content_routes.cpp
+ * Folder: backend/server
+ * File: content_routes.cpp
+ * Purpose: Handles Steam review and developer-post requests for a listed
+ *   game.
+ */
+
 #include "content_routes.h"
 #include "../steam_api/steam_reviews.h"
 #include "../steam_api/steam_patches.h"

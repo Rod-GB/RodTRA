@@ -1,3 +1,10 @@
+/*
+ * Module: gameInfo.js
+ * Folder: frontend/js
+ * File: gameInfo.js
+ * Purpose: Chooses a suitable available post for the Latest update field.
+ */
+
 // Prefer a game update; fall back to an honestly labeled developer announcement.
 export function latestDeveloperPost(posts = []) {
   const valid = posts.filter(post => /^https:\/\//.test(post.url || '')).sort((a, b) =>

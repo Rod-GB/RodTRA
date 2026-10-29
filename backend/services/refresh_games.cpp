@@ -1,3 +1,11 @@
+/*
+ * Module: refresh_games.cpp
+ * Folder: backend/services
+ * File: refresh_games.cpp
+ * Purpose: Keeps Steam records, player history and saved checkpoints moving
+ *   in the background.
+ */
+
 #include "refresh_games.h"
 #include "../config/settings.h"
 #include "../algorithms/quick_sort.h"

@@ -1,3 +1,10 @@
+/*
+ * Component: MostPlayed
+ * Folder: frontend/js/components
+ * File: MostPlayed.jsx
+ * Purpose: Shows up to ten Steam games ranked by current players.
+ */
+
 import React from 'react';
 import Icon from './Icon';
 import Rating from './Rating';

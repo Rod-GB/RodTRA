@@ -1,3 +1,11 @@
+/*
+ * Struct: Document
+ * Folder: backend/services
+ * File: discovery.cpp
+ * Purpose: Reads provider HTML and RSS, refreshes store listings and prices,
+ *   and prepares game details and budget results.
+ */
+
 #include "discovery.h"
 #include "content_cache.h"
 #include "../network/http_client.h"
